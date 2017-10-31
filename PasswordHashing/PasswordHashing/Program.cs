@@ -41,6 +41,7 @@ namespace PasswordHashing
             }
 
             Console.ReadLine(); // pause before exit
+            Console.ReadLine(); // pause extra long!
         }
 
         static string GetMd5(string password, string salt)
