@@ -11,6 +11,7 @@ namespace PasswordHashing
         static void Main(string[] args)
         {
             // ask user to login
+            Console.Write("Welcome!");
             Console.Write("Create username:");
             String username = Console.ReadLine();
             Console.Write("Create password:");
