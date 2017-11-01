@@ -34,6 +34,7 @@ namespace PasswordHashing
             if (hashedPasswordWithSalt == hashWithSaltSavedInDatabase)
             {
                 Console.WriteLine("Passwords matched!  Notice I did not save or compare passwords, just hashes");
+                Console.WriteLine("Nate made pointless comment here for his github commit");
             }
             else
             {
