@@ -39,6 +39,7 @@ namespace PasswordHashing
             else
             {
                 Console.WriteLine("Passwords did not match!  Notice I did not save or compare passwords, just hashes");
+                Console.WriteLine("Please try again after sorting out your life.");
             }
 
             Console.ReadLine(); // pause before exit
