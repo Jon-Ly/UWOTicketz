@@ -26,6 +26,7 @@ namespace PasswordHashing
             String username2 = Console.ReadLine();
             Console.Write("Login with password:");
             String password2 = Console.ReadLine();
+            Console.WriteLine("Hi there.");
 
             // determine hash with salt
             String hashedPasswordWithSalt = GetMd5(password2, username2);
