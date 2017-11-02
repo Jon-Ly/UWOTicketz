@@ -1,0 +1,66 @@
+/*element tags*/
+body {background: #eee !important;}
+
+/*Classes*/
+.wrapper {	
+	margin-top: 80px;
+  	margin-bottom: 80px;
+}
+
+.form-signin {
+  max-width: 380px;
+  padding: 15px 35px 45px;
+  margin: 0 auto;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  text-align:center;
+
+  .form-signin-heading,
+	.checkbox {
+	  margin-bottom: 30px;
+	}
+
+	.checkbox {
+	  font-weight: normal;
+	}
+
+	input[type="text"] {
+	  margin-bottom: -1px;
+	  border-bottom-left-radius: 0;
+	  border-bottom-right-radius: 0;
+	}
+}
+
+.divider {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/*Colors*/
+.redText {color: red;}
+.blueText {color: blue;}
+.greenText{color: green;}
+.whiteText{color: white;}
+.grayText{color: gray;}
+.orangeText{color: orange;}
+
+/*Margins*/
+.marginTop5px {margin-top: 5px;}
+.marginBot5px {margin-bottom: 5px;}
+.marginLeft5px {margin-left: 5px;}
+.marginRight5px {margin-right: 5px;}
+
+.marginTop10px{margin-top: 10px;}
+.marginBot10px{margin-bottom: 10px;}
+.marginLeft10px {margin-left: 10px;}
+.marginRight10px {margin-right: 10px;}
+
+.marginTop15px {margin-top: 15px;}
+.marginBot15px {margin-bottom: 15px;}
+.marginLeft15px {margin-left: 15px;}
+.marginRight15px {margin-right: 15px;}
+
+/*IDs*/
+#addUserButton {
+    max-width: 150px;
+}
