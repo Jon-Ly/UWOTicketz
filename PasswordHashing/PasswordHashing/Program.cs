@@ -11,6 +11,7 @@ namespace PasswordHashing
         static void Main(string[] args)
         {
             // ask user to login
+            Console.Write("Welcome!");
             Console.Write("Create username:");
             String username = Console.ReadLine();
             Console.Write("Create password:");
@@ -25,6 +26,7 @@ namespace PasswordHashing
             String username2 = Console.ReadLine();
             Console.Write("Login with password:");
             String password2 = Console.ReadLine();
+            Console.WriteLine("Hi there.");
 
             // determine hash with salt
             String hashedPasswordWithSalt = GetMd5(password2, username2);
@@ -34,10 +36,12 @@ namespace PasswordHashing
             if (hashedPasswordWithSalt == hashWithSaltSavedInDatabase)
             {
                 Console.WriteLine("Passwords matched!  Notice I did not save or compare passwords, just hashes");
+                Console.WriteLine("Nate made pointless comment here for his github commit");
             }
             else
             {
                 Console.WriteLine("Passwords did not match!  Notice I did not save or compare passwords, just hashes");
+                Console.WriteLine("Please try again after sorting out your life.");
             }
 
             Console.ReadLine(); // pause before exit
