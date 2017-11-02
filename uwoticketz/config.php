@@ -6,6 +6,11 @@
  */
 function config($key = '')
 {
+	
+	//If you're on the campus, you need to change server name to the SE server.
+	//Username and database are the same.
+	//Password is s0688747 (wooo look a password, super secure)
+	
 	//Server config
 	$servername = "localhost";
 	$database = "lyj47";
