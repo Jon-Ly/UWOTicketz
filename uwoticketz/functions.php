@@ -1,4 +1,12 @@
 <?php
+
+//////////////////////////////////////
+//             General              //
+//////////////////////////////////////
+
+/*
+* Construct the navMenu and display.
+*/
 function navMenu(){
 	$navMenu = '';
 
@@ -9,6 +17,9 @@ function navMenu(){
 	echo $navMenu;
 }
 
+/*
+* Get the website icon and display it.
+*/
 function iconImg(){
 	$homeIconLink = "<a class='navbar-brand' href='?page=tickets' id='home'><img src='content/uwoticketz.png'/></a>";
 	echo $homeIconLink;
@@ -31,6 +42,10 @@ function pageContent(){
     }
 }
 
+/*
+* Serves the template.php onto the page.
+* template.php is the "parent" php.
+*/
 function run(){
 	/*
 	*Evaluates the specified file. In this case,
@@ -40,7 +55,7 @@ function run(){
 }
 
 //////////////////////////////////////
-//           Tickets                //
+//             Tickets              //
 //////////////////////////////////////
 
 function ticketTable(){
@@ -63,10 +78,20 @@ function ticketTable(){
 	echo $table;
 }
 
+//////////////////////////////////////
+//          Submit Ticket           //
+//////////////////////////////////////
+
 if(isset($_POST["computerId"]) && isset($_POST["description"])){
 	submitTicket($_POST["computerId"], $_POST["description"]);
 }
 
+/*
+* Inserts a new ticket.
+*
+* @computerId int
+* @description string
+*/
 function submitTicket($computerId, $description){
 	//if(!config("conn")->query("CALL InsertTicket(".$computerId.", ".$description.", 1)")){
 	//	echo json_encode(array("errorMessage" => "Inserting the ticket was unsuccessful. Please contact IT."));
@@ -74,3 +99,22 @@ function submitTicket($computerId, $description){
 
 	echo "hello";
 }
+
+//////////////////////////////////////
+//             Computers            //
+//////////////////////////////////////
+
+
+//////////////////////////////////////
+//              Users               //
+//////////////////////////////////////
+
+
+//////////////////////////////////////
+//              Login               //
+//////////////////////////////////////
+
+
+//////////////////////////////////////
+//          Past Tickets            //
+//////////////////////////////////////

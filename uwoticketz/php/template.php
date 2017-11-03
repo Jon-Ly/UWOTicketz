@@ -1,9 +1,9 @@
 <html>
 <head>
+	<meta charset="UTF-8">
 	<title>UWO Ticketz</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 	<link rel="stylesheet" href="styles/stylesheet.css">
-	<meta http-equiv="Content-Type" content="image/png">
 </head>
 <body>
 
