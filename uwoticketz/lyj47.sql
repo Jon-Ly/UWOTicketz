@@ -44,7 +44,7 @@ INNER JOIN ticketstatus ON ticketstatus.Id = Ticket.Status$$
 CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllUsers` ()  NO SQL
 SELECT * FROM User$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetComputerById` (IN `computerId` INT(11) UNSIGNED)  NO SQL
+CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetComputerById` (IN `computerId` INT(11) UNSIGNED)  NO SQL
 SELECT
 	Id,
     LocationId
