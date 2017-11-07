@@ -1,4 +1,5 @@
 <?php
+require 'config.php';
 
 //////////////////////////////////////
 //             General              //
@@ -82,10 +83,6 @@ function ticketTable(){
 //          Submit Ticket           //
 //////////////////////////////////////
 
-if(isset($_POST["computerId"]) && isset($_POST["description"])){
-	submitTicket($_POST["computerId"], $_POST["description"]);
-}
-
 /*
 * Inserts a new ticket.
 *
@@ -93,18 +90,47 @@ if(isset($_POST["computerId"]) && isset($_POST["description"])){
 * @description string
 */
 function submitTicket($computerId, $description){
-	//if(!config("conn")->query("CALL InsertTicket(".$computerId.", ".$description.", 1)")){
-	//	echo json_encode(array("errorMessage" => "Inserting the ticket was unsuccessful. Please contact IT."));
-	//}
+	if(!config("conn")->query("CALL InsertTicket($computerId, '$description', 1)")){
+		echo json_encode(array("errorMessage" => "Inserting the ticket was unsuccessful. Please contact IT."));
+	}else{
+		
+	}
+}
 
-	echo "hello";
+if(isset($_POST["computerId"]) && isset($_POST["description"])){
+	
+	$computerId = $_POST["computerId"];
+	$description = $_POST["description"];
+	submitTicket($computerId, $description);
 }
 
 //////////////////////////////////////
 //             Computers            //
 //////////////////////////////////////
 
+/*
+* Gets a computer by computerId
+*
+* @computerId int
+* @description string
+*/
+function getComputerById($computerId){
+	
+	$result = config("conn")->query("CALL GetComputerById($computerId)");
 
+	$row = mysqli_fetch_array($result);
+
+	if(!isset($result)){
+		echo json_encode(array("errorMessage" => "The computer does not exist. Please contact IT."));
+	}else{
+		echo json_encode($row);
+	}
+}
+
+if(isset($_GET["computerId"])){
+	$computerId = $_GET["computerId"];
+	getComputerById($computerId);
+}
 //////////////////////////////////////
 //              Users               //
 //////////////////////////////////////
