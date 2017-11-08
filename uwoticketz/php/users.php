@@ -1,6 +1,6 @@
 <div class="container">
 	<!-- <h1>THIS IS THE USERS PAGE!</h1> -->
-  <button class="btn btn-lg btn-primary btn-block" id="addUserButton" type="submit">Add User</button>
+  <button class="btn btn-lg btn-primary btn-block marginTop10px" id="addUserButton" type="submit">Add User</button>
 	<table class="table table-striped">
       <thead>
         <tr>

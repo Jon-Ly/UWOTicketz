@@ -60,6 +60,8 @@ body {background: #eee !important;}
 .marginLeft15px {margin-left: 15px;}
 .marginRight15px {margin-right: 15px;}
 
+.noDisplay{display: none;}
+
 /*IDs*/
 #addUserButton {
     max-width: 150px;

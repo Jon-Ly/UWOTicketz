@@ -11,38 +11,27 @@ $("#submitTicketButton").click(function () {
     var isValidComputerId = /^\d+$/.test(computerId);
     var computerExists = false;
 
-    if (isValidComputerId) {
+    if (computerId != "" && description != "" && isValidComputerId) {
         $.ajax({
-            type: "GET", //request type
+            type: "POST", //request type
             url: "functions.php", //the page containing php script
-            dataType: 'text',
-            data: { computerId: computerId },
+            dataType: JSON,
+            data: { computerId: computerId, description: description },
             success: function (data) {
                 console.log(data);
+                $("#computerId")[0].value = "";
+                $("#description")[0].value = "";
+                $("#successMessage").removeClass("noDisplay");
+                $("#errorMessage").addClass("noDisplay");
             },
-            error: function (data) {
-                console.log(data);
+            error: function (jqXHR, errorStatus, errorText) {
+                $("#errorMessage").removeClass("noDisplay");
+                $("#successMessage").addClass("noDisplay");
             }
         });
-    }
-
-    //if (computerId != "" && description != "" && isValidComputerId) {
-    //    $.ajax({
-    //        type: "POST", //request type
-    //        url: "functions.php", //the page containing php script
-    //        dataType: 'text',
-    //        data: { computerId: computerId, description: description },
-    //        success: function (data) {
-    //            console.log(data);
-    //        },
-    //        error: function (data) {
-    //            console.log(data);
-    //        }
-    //    });
-    //}
-
-    if (!isValidComputerId) {
-        alert("INVALID COMPUTER ID");
+    } else {
         return false;
     }
+
+    return false;
 });
