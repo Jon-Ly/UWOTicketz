@@ -11,3 +11,5 @@
       </tbody>
     </table>
 </div>
+
+<script src="scripts/computers.js"></script>

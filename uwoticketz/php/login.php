@@ -8,3 +8,5 @@
       <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>   
     </form>
   </div>
+
+  <script src="scripts/login.js"></script>

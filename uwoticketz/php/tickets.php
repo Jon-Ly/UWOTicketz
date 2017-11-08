@@ -15,3 +15,5 @@
       </tbody>
     </table>
 </div>
+
+<script src="scripts/tickets.js"></script>

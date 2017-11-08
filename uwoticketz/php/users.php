@@ -28,3 +28,5 @@
       </tbody>
     </table>
 </div>
+
+<script src="scripts/users.js"></script>
