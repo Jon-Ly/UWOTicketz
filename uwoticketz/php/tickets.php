@@ -1,5 +1,4 @@
 <div class="container">
-	<h1>THIS IS THE TICKETS PAGE!</h1>
 	<table class="table table-striped">
       <thead>
         <tr>

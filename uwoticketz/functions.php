@@ -90,9 +90,13 @@ function ticketTable(){
 * @description string
 */
 function submitTicket($computerId, $description){
-	if(!config("conn")->query("CALL InsertTicket($computerId, '$description', 1)")){
-		throw new Exception("The computer number could not be found. Please contact IT.");
-		echo json_encode($e->getMessage());
+	try{
+		if(!config("conn")->query("CALL InsertTicket($computerId, '$description', 1)")){
+			throw new Exception("The computer number could not be found. Please contact IT.");
+		}
+		echo json_encode(array());
+	}catch(Exception $e){
+		echo $e->getMessage();
 	}
 }
 
@@ -105,6 +109,22 @@ if(isset($_POST["computerId"]) && isset($_POST["description"])){
 //////////////////////////////////////
 //             Computers            //
 //////////////////////////////////////
+
+function computerTable(){
+	$result = config("conn")->query("CALL GetAllComputers()");
+
+	$table = "";
+
+	while ($row = mysqli_fetch_array($result)){
+		$table .= 
+		"<tr>
+			<td>".$row["Id"]."</td>
+			<td>".$row["LocationId"]."</td>
+		</tr>";
+	}
+
+	echo $table;
+}
 
 /*
 * Gets a computer by computerId
