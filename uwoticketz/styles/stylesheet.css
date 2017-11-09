@@ -7,7 +7,7 @@ body {background: #eee !important;}
   	margin-bottom: 80px;
 }
 
-.form-signin {
+.formDefault {
   max-width: 380px;
   padding: 15px 35px 45px;
   margin: 0 auto;
@@ -40,7 +40,7 @@ body {background: #eee !important;}
 .redText {color: #ff0000;}
 .blueText {color: #0026ff;}
 .greenText{color: #00ff21;}
-.whiteText{color: #000000;}
+.whiteText{color: #FFFFFF;}
 .grayText{color: #808080;}
 .orangeText{color: #ff6a00;}
 
@@ -65,7 +65,14 @@ body {background: #eee !important;}
 /*Text Styling*/
 .bold{font-weight: bold;}
 
+.floatRight{float:right;}
+.floatLeft{float:left;}
+
 /*IDs*/
 #addUserButton {
     max-width: 150px;
+}
+
+#header{
+    border-bottom: 1px solid rgba(0,0,0, 0.2);
 }

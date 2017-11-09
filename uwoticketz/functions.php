@@ -126,6 +126,24 @@ function computerTable(){
 	echo $table;
 }
 
+function locationList(){
+	$result = config("conn")->query("CALL GetAllLocations()");
+
+	$selection = "<option value='-1'></option>";
+
+	while ($row = mysqli_fetch_array($result)){
+		
+		$value = $row["Id"];
+
+		$selection .= 
+		"<option value='$value'>"
+			.$row["LocationName"].
+		"</option>";
+	}
+
+	echo $selection;
+}
+
 /*
 * Gets a computer by computerId
 *
@@ -149,6 +167,23 @@ if(isset($_GET["computerId"])){
 //              Users               //
 //////////////////////////////////////
 
+function userTable(){
+	$result = config("conn")->query("CALL GetAllUsers()");
+
+	$table = "";
+
+	while ($row = mysqli_fetch_array($result)){
+		$table .= 
+		"<tr>
+			<td>".$row["FirstName"]."</td>
+			<td>".$row["LastName"]."</td>
+			<td>".$row["Username"]."</td>
+			<td>".$row["AccessLevel"]."</td>
+		</tr>";
+	}
+
+	echo $table;
+}
 
 //////////////////////////////////////
 //              Login               //
