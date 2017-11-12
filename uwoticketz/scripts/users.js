@@ -8,15 +8,45 @@ $("#submitUserButton").click(function(e) {
 
     var inputs = $("#addUserForm input");
 
-    for (var i = 0; i < inputs.length; i++){
-        if (inputs[0].value === "") {
-            validForm = false;
-            break;
-        }
+    var firstName = $("#firstName")[0].value;
+    var lastName = $("#lastName")[0].value;
+    var username = $("#username")[0].value;
+    var accessLevel = parseInt($("#accessLevel option:selected")[0].value);
+
+    var validNames = (/^[a-zA-Z]+$/.test(firstName) && /^[a-zA-Z]+$/.test(lastName));
+
+    var successful = false;
+
+    if (firstName != "" && lastName != "" && username != "" && accessLevel >= 0 && validNames) {
+        $.ajax({
+            type: "POST", //request type
+            url: "functions.php", //the page containing php script
+            dataType: 'json',
+            data: {
+                firstName,
+                lastName,
+                username,
+                accessLevel
+            },
+            success: function (data) {
+                $("#firstName")[0].value = "";
+                $("#lastName")[0].value = "";
+                $("#username")[0].value = "";
+                $("#accessLevel option:selected").prop("selected", false);
+                successful = true;
+            },
+            error: function (jqXHR, errorStatus, errorText) {
+                //console.log(jqXHR.responseText);
+            },
+            complete: function () {
+                // close the modal
+                e.preventDefault();
+                $('#addUserModal').modal('toggle');
+            }
+        });
+    } else {
+        return false;
     }
 
-    if (validForm) {
-        e.preventDefault();
-        $('#addUserModal').modal('toggle');
-    }
+    return false;
 });

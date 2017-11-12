@@ -12,7 +12,10 @@ function navMenu(){
 	$navMenu = '';
 
     foreach (config('nav_menu') as $uri => $name) {
-        $navMenu .= "<li class='nav-item'><a class='nav-link' href='?page=".$uri."'></li>".$name."</a>";
+		if($uri != "submit")
+			$navMenu .= "<li class='nav-item marginRight10px bold'><a class='nav-link' href='?page=".$uri."'>".$name."</li></a>";
+		else
+			$navMenu .= "<li class='nav-item'><a class='nav-link bold' data-toggle='modal' data-target='#submitTicketModal' href='#'>".$name."</li></a>";
     }
 
 	echo $navMenu;
@@ -22,7 +25,7 @@ function navMenu(){
 * Get the website icon and display it.
 */
 function iconImg(){
-	$homeIconLink = "<a class='navbar-brand' href='?page=tickets' id='home'><img src='content/uwoticketz.png'/></a>";
+	$homeIconLink = "<a class='navbar-brand' href='?page=tickets' id='home'><img src='content/uwoticketz-logo-64x64.png'/></a>";
 	echo $homeIconLink;
 }
 
@@ -50,7 +53,7 @@ function pageContent(){
 function run(){
 	/*
 	*Evaluates the specified file. In this case,
-	*display the php onto the page.
+	*display the template.php onto the page.
 	*/
 	include config('template_path')."/template.php";
 }
@@ -89,7 +92,7 @@ function ticketTable(){
 * @computerId int
 * @description string
 */
-function submitTicket($computerId, $description){
+function insertTicket($computerId, $description){
 	try{
 		if(!config("conn")->query("CALL InsertTicket($computerId, '$description', 1)")){
 			throw new Exception("The computer number could not be found. Please contact IT.");
@@ -103,7 +106,7 @@ function submitTicket($computerId, $description){
 if(isset($_POST["computerId"]) && isset($_POST["description"])){
 	$computerId = $_POST["computerId"];
 	$description = $_POST["description"];
-	submitTicket($computerId, $description);
+	insertTicket($computerId, $description);
 }
 
 //////////////////////////////////////
@@ -119,7 +122,7 @@ function computerTable(){
 		$table .= 
 		"<tr>
 			<td>".$row["Id"]."</td>
-			<td>".$row["LocationId"]."</td>
+			<td>".$row["LocationName"]."</td>
 		</tr>";
 	}
 
@@ -185,11 +188,68 @@ function userTable(){
 	echo $table;
 }
 
+function insertUser($firstName, $lastName, $username, $accessLevel){
+	try{
+		if(!config("conn")->query("CALL InsertUser('$firstName', '$lastName', '$username', $accessLevel)")){
+			throw new Exception("The user could not be entered. Please contact IT.");
+		}
+		echo json_encode(array());
+	}catch(Exception $e){
+		echo $e;
+	}
+}
+
+if(isset($_POST["firstName"]) && isset($_POST["lastName"]) && isset($_POST["username"]) && isset($_POST["accessLevel"])){
+	$firstName = $_POST["firstName"];
+	$lastName = $_POST["lastName"];
+	$username = $_POST["username"];
+	$accessLevel = $_POST["accessLevel"];
+	insertUser($firstName, $lastName, $username, $accessLevel);
+}
+
+function accessLevelList(){
+	$result = config("conn")->query("CALL GetAllAccessLevels()");
+
+	$selection = "<option value='-1'></option>";
+
+	while ($row = mysqli_fetch_array($result)){
+		
+		$value = $row["Id"];
+
+		$selection .= 
+		"<option value='$value'>"
+			.$row["AccessLevel"].
+		"</option>";
+	}
+
+	echo $selection;
+}
+
 //////////////////////////////////////
 //              Login               //
 //////////////////////////////////////
 
 
 //////////////////////////////////////
-//          Past Tickets            //
+//          User Tickets            //
 //////////////////////////////////////
+
+function userTicketTable(){
+	$userId = '';//this will be the session
+
+	$result = config("conn")->query("CALL GetTicketsByUserId()");
+
+	$table = "";
+
+	while ($row = mysqli_fetch_array($result)){
+		$table .= 
+		"<tr>
+			<td>".$row["FirstName"]."</td>
+			<td>".$row["LastName"]."</td>
+			<td>".$row["Username"]."</td>
+			<td>".$row["AccessLevel"]."</td>
+		</tr>";
+	}
+
+	echo $table;
+}

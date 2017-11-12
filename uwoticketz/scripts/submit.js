@@ -1,5 +1,3 @@
-var ajaxURL = "../uwoticketz/";
-
 $(document).ready(function () {
 });
 
@@ -27,7 +25,6 @@ $("#submitTicketButton").click(function () {
             dataType: 'json',
             data: { computerId: computerId, description: description },
             success: function (data) {
-                console.log(data);
                 $("#computerId")[0].value = "";
                 $("#description")[0].value = "";
                 $("#successMessage").removeClass("noDisplay");

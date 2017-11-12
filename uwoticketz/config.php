@@ -24,7 +24,8 @@ function config($key = '')
             '' => '',
             'computers' => 'Computers',
             'users' => 'Users',
-            'submit' => 'Submit Ticket',
+			'userTickets' => 'Past Tickets',
+            'submit' => 'Submit Ticket'
         ],
         'template_path' => 'php',
 		'conn' => mysqli_connect($servername, $username, $password, $database)
