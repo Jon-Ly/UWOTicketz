@@ -32,7 +32,6 @@
 <div id="mainContent">
 	<?php pageContent(); ?>
 
-
 	<!-- Submit Ticket Modal is available on all pages -->
 	<div class="wrapper">
 		<div class="modal fade" id="submitTicketModal" role="dialog">
@@ -44,7 +43,7 @@
 					<button type="button" class="close" data-dismiss="modal">&times;</button>
 				</div>
 				<div class="modal-body">
-					  <form id="submitTicketForm" method="POST">
+					<form id="submitTicketForm" method="POST">
 						<div class="form-group">
 							<label>Computer Number</label>
 							<input type="text" class="form-control numeric" id="computerId" name="computerId" placeholder="Computer Number" maxlength="5" required autofocus novalidate/>
@@ -55,7 +54,7 @@
 						</div>
 						<button class="btn btn-success floatRight" type="submit" id="submitTicketButton">Submit</button>
 						<button type="button" class="btn btn-default floatRight marginRight10px" data-dismiss="modal">Cancel</button>
-					  </form>
+					</form>
 				</div>
 			  </div>
 			</div>

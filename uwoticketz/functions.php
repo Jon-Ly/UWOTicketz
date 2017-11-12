@@ -99,7 +99,7 @@ function insertTicket($computerId, $description){
 		}
 		echo json_encode(array());
 	}catch(Exception $e){
-		echo $e->getMessage();
+		echo $e;
 	}
 }
 
@@ -147,6 +147,23 @@ function locationList(){
 	echo $selection;
 }
 
+function insertComputer($computerId, $location){
+	try{
+		if(!config("conn")->query("CALL InsertComputer($computerId, $location)")){
+			throw new Exception("The computer could not be entered.");
+		}
+		echo json_encode(array());
+	}catch(Exception $e){
+		echo $e;
+	}
+}
+
+if(isset($_POST["computerNumber"]) && isset($_POST["location"])){
+	$computerId = $_POST["computerNumber"];
+	$location = $_POST["location"];
+	insertComputer($computerId, $location);
+}
+
 /*
 * Gets a computer by computerId
 *
@@ -191,7 +208,7 @@ function userTable(){
 function insertUser($firstName, $lastName, $username, $accessLevel){
 	try{
 		if(!config("conn")->query("CALL InsertUser('$firstName', '$lastName', '$username', $accessLevel)")){
-			throw new Exception("The user could not be entered. Please contact IT.");
+			throw new Exception("The user could not be entered.");
 		}
 		echo json_encode(array());
 	}catch(Exception $e){
