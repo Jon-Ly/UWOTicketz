@@ -19,7 +19,7 @@ $("#submitComputerButton").click(function (e) {
                 $("#location option:selected").prop("selected", false);
             },
             error: function (jqXHR, errorStatus, errorText) {
-                console.log(jqXHR.responseText);
+                
             },
             complete: function () {
                 // close the modal

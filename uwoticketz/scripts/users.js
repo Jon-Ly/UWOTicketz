@@ -36,7 +36,7 @@ $("#submitUserButton").click(function(e) {
                 successful = true;
             },
             error: function (jqXHR, errorStatus, errorText) {
-                //console.log(jqXHR.responseText);
+                
             },
             complete: function () {
                 // close the modal

@@ -33,7 +33,7 @@
 				<div class="form-group">
 					<label>Location</label>
 					<select class="form-control" id="location">
-						<?php locationList(); ?>
+						<?php getLocationList(); ?>
 					</select>
 				</div>
 				<button class="btn btn-success floatRight" type="submit" id="submitComputerButton">Submit</button>

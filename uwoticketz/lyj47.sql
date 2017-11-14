@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 07, 2017 at 03:08 PM
+-- Generation Time: Nov 14, 2017 at 04:08 AM
 -- Server version: 10.1.26-MariaDB
 -- PHP Version: 7.1.9
 
@@ -27,22 +27,61 @@ DELIMITER $$
 -- Procedures
 --
 CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllAccessLevels` ()  NO SQL
-SELECT * FROM accesslevel$$
+SELECT
+	Id,
+    AccessLevel
+FROM 
+	accesslevel$$
 
 CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllComputers` ()  NO SQL
-SELECT * FROM Computer$$
+SELECT
+	computer.Id,
+    LocationName
+FROM
+	computer
+    INNER JOIN location ON computer.LocationId = location.Id
+ORDER BY
+	computer.Id
+ASC$$
+
+CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllLocations` ()  NO SQL
+SELECT
+	Id,
+    LocationName
+FROM
+	location
+ORDER BY
+	LocationName
+ASC$$
 
 CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllLogs` ()  NO SQL
 SELECT * FROM Log$$
 
+CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllStatuses` ()  NO SQL
+SELECT
+	Id,
+    StatusName
+FROM
+	ticketstatus$$
+
 CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllTickets` ()  READS SQL DATA
 SELECT
 Ticket.Id, ComputerId, DateSubmitted, DateCompleted, StatusName, Rating
-FROM Ticket 
-INNER JOIN ticketstatus ON ticketstatus.Id = Ticket.Status$$
+FROM 
+	Ticket 
+    INNER JOIN ticketstatus ON ticketstatus.Id = Ticket.Status
+ORDER BY
+	DateSubmitted
+DESC$$
 
 CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllUsers` ()  NO SQL
-SELECT * FROM User$$
+SELECT
+	FirstName,
+    LastName,
+    Username,
+    AccessLevel
+FROM User
+INNER JOIN accesslevel ON AccessLevelId = accesslevel.Id$$
 
 CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetComputerById` (IN `computerId` INT(11) UNSIGNED)  NO SQL
 SELECT
@@ -53,10 +92,69 @@ FROM
 WHERE
 	Id = computerId$$
 
+CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetStatusById` (IN `statusId` INT(11))  NO SQL
+SELECT
+	Id,
+    StatusName
+FROM
+	ticketstatus
+WHERE
+	Id = statusId$$
+
+CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetTicketsByUserId` (IN `userId` INT(11))  NO SQL
+SELECT
+	ticket.Id,
+    ComputerId,
+    DateSubmitted,
+    DateCompleted,
+    Status,
+    Description,
+    Rating,
+    Comments,
+    UserId
+FROM
+	ticket INNER JOIN user ON UserId = user.Id
+WHERE
+	UserId = userId$$
+
+CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetTimeStampForTicket` (IN `ticketNumber` INT(11))  NO SQL
+SELECT
+	DateCompleted
+FROM
+	ticket
+WHERE
+	Id = ticketNumber$$
+
+CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertComputer` (IN `computerId` INT(11), IN `location` INT(11))  NO SQL
+INSERT INTO computer
+(Id, LocationId)
+VALUES
+(computerId, location)$$
+
 CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertTicket` (IN `computerId` INT(11) UNSIGNED, IN `description` VARCHAR(500), IN `userId` INT(11) UNSIGNED)  MODIFIES SQL DATA
 INSERT INTO
 ticket(ComputerId, UserId, DateSubmitted, Description, Status)
 VALUES(computerId, userId, CURRENT_TIMESTAMP, description, 1)$$
+
+CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertUser` (IN `firstName` VARCHAR(25), IN `lastName` VARCHAR(25), IN `username` VARCHAR(10), IN `accessLevel` INT(11))  NO SQL
+INSERT INTO user
+(FirstName, LastName, Username, AccessLevelId, Password, Archived)
+VALUES
+(firstName, lastName, username, accessLevel, 'password', 0)$$
+
+CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `UpdateTicketStatus` (IN `ticketNumber` INT(11), IN `statusId` INT(11), IN `name` VARCHAR(25))  NO SQL
+IF name = 'Completed' THEN
+    UPDATE ticket SET
+        Status = statusId,
+        DateCompleted = CURRENT_TIMESTAMP
+    WHERE
+        iD = ticketNumber;
+ELSE
+	UPDATE ticket SET
+        Status = statusId
+    WHERE
+        Id = ticketNumber;
+END IF$$
 
 DELIMITER ;
 
@@ -79,6 +177,19 @@ INSERT INTO `accesslevel` (`Id`, `AccessLevel`) VALUES
 (0, 'User'),
 (1, 'IT'),
 (2, 'Auditor');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `comments`
+--
+
+CREATE TABLE `comments` (
+  `Id` int(11) NOT NULL,
+  `TicketNumber` int(11) NOT NULL,
+  `Comment` text NOT NULL,
+  `DateSubmitted` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -106,7 +217,8 @@ INSERT INTO `computer` (`Id`, `LocationId`) VALUES
 (107, 4),
 (108, 4),
 (109, 4),
-(110, 4);
+(110, 4),
+(111, 4);
 
 -- --------------------------------------------------------
 
@@ -206,7 +318,7 @@ CREATE TABLE `user` (
   `LastName` varchar(25) NOT NULL,
   `AccessLevelId` int(11) NOT NULL,
   `Password` varchar(100) NOT NULL,
-  `Username` varchar(25) NOT NULL,
+  `Username` varchar(10) NOT NULL,
   `Archived` bit(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -215,7 +327,11 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`Id`, `FirstName`, `LastName`, `AccessLevelId`, `Password`, `Username`, `Archived`) VALUES
-(1, 'Joe', 'Joe', 1, 'password', 'password', b'1111111111111111111111111111111');
+(1, 'Joe', 'Joe', 1, 'password', 'password', b'1111111111111111111111111111111'),
+(2, 'a', 'a', 0, 'password', 'a', b'1111111111111111111111111111111'),
+(3, 'dad', 'dad', 0, 'password', 'dad', b'1111111111111111111111111111111'),
+(4, 'mom', 'mom', 0, 'password', 'mom', b'1111111111111111111111111111111'),
+(5, 'dwad', 'dwad', 1, 'password', 'dwad', b'1111111111111111111111111111111');
 
 --
 -- Indexes for dumped tables
@@ -226,6 +342,13 @@ INSERT INTO `user` (`Id`, `FirstName`, `LastName`, `AccessLevelId`, `Password`, 
 --
 ALTER TABLE `accesslevel`
   ADD PRIMARY KEY (`Id`);
+
+--
+-- Indexes for table `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `TicketNumber` (`TicketNumber`);
 
 --
 -- Indexes for table `computer`
@@ -268,11 +391,18 @@ ALTER TABLE `ticketstatus`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`Id`),
+  ADD UNIQUE KEY `Username` (`Username`),
   ADD KEY `AccessLevelId` (`AccessLevelId`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `location`
@@ -290,17 +420,23 @@ ALTER TABLE `log`
 -- AUTO_INCREMENT for table `ticket`
 --
 ALTER TABLE `ticket`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`TicketNumber`) REFERENCES `ticket` (`Id`);
 
 --
 -- Constraints for table `computer`

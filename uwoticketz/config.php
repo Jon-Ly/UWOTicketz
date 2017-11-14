@@ -7,16 +7,23 @@
 function config($key = '')
 {
 	
-	//If you're on the campus, you need to change server name to the SE server.
+	//If you're on the campus, you need to change server name to the SE server --> softeng.cs.uwosh.edu.
 	//Username and database are the same.
 	//Password is s0688747 (wooo look a password, super secure)
 	
 	//Server config
-	$servername = "localhost";
-	$database = "lyj47";
+	$host = "localhost";
+	$db = "lyj47";
 	$username = "lyj47";
 	$password = "";
+	$charset = 'utf8mb4';
 
+	$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+	$opt = [
+		PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+		PDO::ATTR_EMULATE_PREPARES   => false,
+	];
 	//View config
     $config = [
         'name' => 'UWO Ticketz',
@@ -28,14 +35,8 @@ function config($key = '')
             'submit' => 'Submit Ticket'
         ],
         'template_path' => 'php',
-		'conn' => mysqli_connect($servername, $username, $password, $database)
+		'conn' => new PDO($dsn, $username, $password, $opt)
     ];
-
-	// Check connection
-
-	if (!$config["conn"]) {
-		die("Connection failed: " . mysqli_connect_error());
-	}
 
     return isset($config[$key]) ? $config[$key] : null;
 }

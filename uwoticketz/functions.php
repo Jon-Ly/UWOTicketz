@@ -62,24 +62,85 @@ function run(){
 //             Tickets              //
 //////////////////////////////////////
 
+/**
+* Construct the Tickets table.
+*/
 function ticketTable(){
 	$result = config("conn")->query("CALL GetAllTickets()");
 
+	$statuses = config("conn")->query("CALL GetAllStatuses()");
+
+	$statusData = $statuses->fetchAll();
+
 	$table = "";
 
-	while ($row = mysqli_fetch_array($result)){
+	while ($row = $result->fetch()){
 		$table .= 
 		"<tr>
 			<td>".$row["Id"]."</td>
 			<td>".$row["ComputerId"]."</td>
 			<td>".$row["DateSubmitted"]."</td>
-			<td>".$row["DateCompleted"]."</td>
-			<td>".$row["StatusName"]."</td>
-			<td>".$row["Rating"]."</td>
+			<td>".$row["DateCompleted"]."</td>";
+
+			if(strtolower($row["StatusName"]) == "completed")
+				$table.= ("<td><select class='form-control statusSelect' disabled><option>".$row["StatusName"]."</option></select></td>");
+			else
+				$table.= ("<td><select class='form-control statusSelect'>".buildStatusSelection($row["StatusName"], $statusData)."</select></td>");
+
+		$table .=
+			"<td>".$row["Rating"]."</td>
 		</tr>";
 	}
 
 	echo $table;
+}
+
+/**
+* One of the columns is a select, let's create that here.
+*/
+function buildStatusSelection($statusName, $statuses){
+	$selection = "";
+
+	for($x = 0; $x < count($statuses); $x++){
+	    $row = $statuses[$x];
+		if($row["StatusName"] == $statusName){
+			if(strtolower($statusName) == "completed"){
+				$selection .= "<option value='".$row["Id"]."' selected>".$row["StatusName"]."</option>";
+			}else{
+				$selection .= "<option value='".$row["Id"]."' selected>".$row["StatusName"]."</option>";
+			}
+		}else{
+			$selection .= "<option value='".$row["Id"]."' name='".$row["StatusName"]."' >".$row["StatusName"]."</option>";
+		}
+	}
+
+	return $selection;
+}
+
+/**
+* This triggers when an admin changes the status of a ticket on the front page.
+*/
+function updateTicketStatus($ticketNumber, $statusId, $statusName){
+	try{		
+		if(!config("conn")->query("CALL UpdateTicketStatus($ticketNumber, $statusId, '$statusName')")){
+			throw new Exception("Unable to change the status of that ticket.");
+		}
+
+		$result = config("conn")->query("CALL GetTimeStampForTicket($ticketNumber)");
+
+		$row = $result->fetch();
+
+		echo json_encode(array("dateCompleted" => $row["DateCompleted"]));
+	}catch(Exception $e){
+		echo $e;
+	}
+}
+
+if(isset($_POST["ticketNumber"]) && isset($_POST["statusId"]) && isset($_POST["statusName"])){
+	$ticketNumber = $_POST["ticketNumber"];
+	$statusId = $_POST["statusId"];
+	$statusName = $_POST["statusName"];
+	updateTicketStatus($ticketNumber, $statusId, $statusName);
 }
 
 //////////////////////////////////////
@@ -118,7 +179,7 @@ function computerTable(){
 
 	$table = "";
 
-	while ($row = mysqli_fetch_array($result)){
+	while ($row = $result->fetch()){
 		$table .= 
 		"<tr>
 			<td>".$row["Id"]."</td>
@@ -129,12 +190,12 @@ function computerTable(){
 	echo $table;
 }
 
-function locationList(){
+function getLocationList(){
 	$result = config("conn")->query("CALL GetAllLocations()");
 
 	$selection = "<option value='-1'></option>";
 
-	while ($row = mysqli_fetch_array($result)){
+	while ($row = $result->fetch()){
 		
 		$value = $row["Id"];
 
@@ -174,7 +235,7 @@ function getComputerById($computerId){
 	
 	$result = config("conn")->query("CALL GetComputerById($computerId)");
 
-	$row = mysqli_fetch_array($result);
+	$row = $result->fetch();
 
 	echo json_encode($row);
 }
@@ -192,7 +253,7 @@ function userTable(){
 
 	$table = "";
 
-	while ($row = mysqli_fetch_array($result)){
+	while ($row = $result->fetch()){
 		$table .= 
 		"<tr>
 			<td>".$row["FirstName"]."</td>
@@ -229,7 +290,7 @@ function accessLevelList(){
 
 	$selection = "<option value='-1'></option>";
 
-	while ($row = mysqli_fetch_array($result)){
+	while ($row = $result->fetch()){
 		
 		$value = $row["Id"];
 
@@ -258,7 +319,7 @@ function userTicketTable(){
 
 	$table = "";
 
-	while ($row = mysqli_fetch_array($result)){
+	while ($row = $result->fetch()){
 		$table .= 
 		"<tr>
 			<td>".$row["FirstName"]."</td>
