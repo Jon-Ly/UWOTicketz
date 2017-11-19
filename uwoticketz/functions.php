@@ -306,7 +306,37 @@ function accessLevelList(){
 //////////////////////////////////////
 //              Login               //
 //////////////////////////////////////
+function set_pwd($user, $pwd) {
+   $i =  password_hash($pwd, PASSWORD_DEFAULT);
+   try{
+      $query = "UPDATE user SET Password=$i  WHERE Username=$user";
+      $stmt = config("conn")->prepare($query);
+      $stmt->execute();
+      return true;
+   }catch (PDOException $e) {
+      db_disconnect();
+      exit("Aborting: There was a database error when updating password");
+   }
+}
 
+/*
+	Returns false if query returned no results or if pwd doesn't match
+*/
+function verify_pwd($user, $pwd) {
+   $ret = false;
+      try {
+         $query = "SELECT Password FROM user WHERE Username=$user";
+         $stmt = config("conn")->prepare($query);
+         $stmt->execute();
+         $hash = $stmt->fetch(PDO::FETCH_ASSOC);
+         $ret = password_verify($pwd, $hash['Password']);
+      } catch (PDOException $e) {
+         db_disconnect();
+         exit("Aborting: There was a database error when verifying password");
+      }
+   }
+   return $ret;
+}
 
 //////////////////////////////////////
 //          User Tickets            //
