@@ -5,18 +5,46 @@ require 'config.php';
 //             General              //
 //////////////////////////////////////
 
+function isAdmin(){
+	return (isset($_SESSION["accessLevel"]) && strtolower($_SESSION["accessLevel"]) == "it");
+}
+function isUser(){
+	return (isset($_SESSION["accessLevel"]) && strtolower($_SESSION["accessLevel"]) == "user");
+}
+function isAuditor(){
+	return (isset($_SESSION["accessLevel"]) && strtolower($_SESSION["accessLevel"]) == "auditor");
+}
+
 /*
 * Construct the navMenu and display.
 */
 function navMenu(){
 	$navMenu = '';
 
-    foreach (config('nav_menu') as $uri => $name) {
-		if($uri != "submit")
-			$navMenu .= "<li class='nav-item marginRight10px bold'><a class='nav-link' href='?page=".$uri."'>".$name."</li></a>";
-		else
-			$navMenu .= "<li class='nav-item'><a class='nav-link bold' data-toggle='modal' data-target='#submitTicketModal' href='#'>".$name."</li></a>";
-    }
+	if(strtolower($_SESSION["accessLevel"]) == "it"){
+		foreach (config('nav_menu') as $uri => $name) {
+			if($uri != "submit")
+				$navMenu .= "<li class='nav-item marginRight10px bold'><a class='nav-link' href='?page=".$uri."'>".$name."</li></a>";
+			else
+				$navMenu .= "<li class='nav-item'><a class='nav-link bold' data-toggle='modal' data-target='#submitTicketModal' href='#'>".$name."</li></a>";
+		}
+	}else if(strtolower($_SESSION["accessLevel"]) == "user"){
+		foreach (config('user_nav_menu') as $uri => $name) {
+			if($uri != "submit")
+				$navMenu .= "<li class='nav-item marginRight10px bold'><a class='nav-link' href='?page=".$uri."'>".$name."</li></a>";
+			else
+				$navMenu .= "<li class='nav-item'><a class='nav-link bold' data-toggle='modal' data-target='#submitTicketModal' href='#'>".$name."</li></a>";
+		}
+	}else if(strtolower($_SESSION["accessLevel"]) == "auditor"){
+		foreach (config('auditor_nav_menu') as $uri => $name) {
+			if($uri != "submit")
+				$navMenu .= "<li class='nav-item marginRight10px bold'><a class='nav-link' href='?page=".$uri."'>".$name."</li></a>";
+			else
+				$navMenu .= "<li class='nav-item'><a class='nav-link bold' data-toggle='modal' data-target='#submitTicketModal' href='#'>".$name."</li></a>";
+		}
+	}else{
+		header('location: login.php');
+	}
 
 	echo $navMenu;
 }
@@ -34,6 +62,10 @@ function iconImg(){
 * It then constructs the URL and displays
 */
 function pageContent(){
+
+	if(!isAdmin() && !isAuditor() && !isUser()){
+		header('location: logout.php');
+	}
 
 	$page = isset($_GET['page']) ? $_GET['page'] : 'tickets';
 
@@ -334,7 +366,6 @@ function verify_pwd($user, $pwd) {
          db_disconnect();
          exit("Aborting: There was a database error when verifying password");
       }
-   }
    return $ret;
 }
 
