@@ -12,7 +12,7 @@ function config($key = '')
 	//Password is s0688747 (wooo look a password, super secure)
 	
 	//Server config
-	$host = "localhost";
+	$host = "http://softeng.cs.uwosh.edu";
 	$db = "lyj47";
 	$username = "lyj47";
 	$password = "";
@@ -27,13 +27,27 @@ function config($key = '')
 	//View config
     $config = [
         'name' => 'UWO Ticketz',
-        'nav_menu' => [
+        'nav_menu' => [ //default is IT.
             '' => '',
             'computers' => 'Computers',
             'users' => 'Users',
 			'userTickets' => 'Past Tickets',
-            'submit' => 'Submit Ticket'
+            'submit' => 'Submit Ticket',
+			'logout' => 'Logout'
         ],
+		'auditor_nav_menu' => [
+			'' => '',
+			'computers' => 'Computers',
+            'users' => 'Users',
+			'userTickets' => 'Past Tickets',
+            'submit' => 'Submit Ticket',
+			'logout' => 'Logout'
+		],
+		'user_nav_menu' =>[
+			'' => '',
+			'submit' => 'Submit Ticket',
+			'logout' => 'Logout'
+		],
         'template_path' => 'php',
 		'conn' => new PDO($dsn, $username, $password, $opt)
     ];
