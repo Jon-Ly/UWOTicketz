@@ -6,13 +6,12 @@
           <th>Ticket Number</th>
           <th>Computer</th>
           <th>Submitted</th>
-          <th>Completed</th>
-          <th>Status</th>
-		  <th>Feedback</th>
+		  <th>Location</th>
+		  <!-- <th>Feedback</th> -->
         </tr>
       </thead>
       <tbody>
-        <?php ticketTable(); ?>
+        <?php userTicketTable(); ?>
       </tbody>
     </table>
 </div>

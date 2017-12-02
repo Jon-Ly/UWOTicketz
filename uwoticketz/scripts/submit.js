@@ -21,16 +21,14 @@ $(document).ready(function () {
                 dataType: 'json',
                 data: { computerId: computerId, description: description },
                 success: function (data) {
-                    $("#computerId")[0].value = "";
-                    $("#description")[0].value = "";
-                    $("#successMessage").removeClass("noDisplay");
-                    $("#errorMessage").addClass("noDisplay");
+
                 },
                 error: function (jqXHR, errorStatus, errorText) {
-                    $("#errorMessage").removeClass("noDisplay");
-                    $("#successMessage").addClass("noDisplay");
+
                 },
                 complete: function () {
+                    $("#computerId")[0].value = "";
+                    $("#description")[0].value = "";
                     // close the modal
                     e.preventDefault();
                     $('#submitTicketModal').modal('toggle');

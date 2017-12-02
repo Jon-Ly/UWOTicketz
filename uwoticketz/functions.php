@@ -2,6 +2,22 @@
 require 'config.php';
 
 //////////////////////////////////////
+//     Session Timeout Check        //
+//////////////////////////////////////
+
+$time = $_SERVER['REQUEST_TIME'];
+
+$timeout_duration = 1200; //20 minute session duration
+
+if(isset($_SESSION["last_activity"]) &&
+	($time - $_SESSION["last_activity"]) > $timeout_duration){
+	
+	header('location: login.php');
+}
+
+$_SESSION['last_activity'] = $time;
+
+//////////////////////////////////////
 //             General              //
 //////////////////////////////////////
 
@@ -53,7 +69,15 @@ function navMenu(){
 * Get the website icon and display it.
 */
 function iconImg(){
-	$homeIconLink = "<a class='navbar-brand' href='?page=tickets' id='home'><img src='content/uwoticketz-logo-64x64.png'/></a>";
+
+	$link = "";
+
+	if(isAdmin() || isAuditor())
+		$link = "?page=tickets";
+	if(isUser())
+		$link = "?page=userTickets";
+
+	$homeIconLink = "<a class='navbar-brand' href='$link' id='home'><img src='content/uwoticketz-logo-64x64.png'/></a>";
 	echo $homeIconLink;
 }
 
@@ -67,8 +91,16 @@ function pageContent(){
 		header('location: logout.php');
 	}
 
-	$page = isset($_GET['page']) ? $_GET['page'] : 'tickets';
+	$page = "";
 
+	if(isAdmin() || isAuditor())
+		$page = isset($_GET['page']) ? $_GET['page'] : 'tickets';
+	if(isUser()){
+		if(isset($_GET['page']) && $_GET['page'] == 'logout')
+			$page = 'logout';
+		else
+			$page = 'userTickets';
+	}
     $path = getcwd().'/'.config('template_path').'/'.$page.'.php';
 
     if (file_exists(filter_var($path, FILTER_SANITIZE_URL))) {
@@ -186,8 +218,10 @@ if(isset($_POST["ticketNumber"]) && isset($_POST["statusId"]) && isset($_POST["s
 * @description string
 */
 function insertTicket($computerId, $description){
+	session_start();
+	$userId = $_SESSION["userId"];
 	try{
-		if(!config("conn")->query("CALL InsertTicket($computerId, '$description', 1)")){
+		if(!config("conn")->query("CALL InsertTicket($computerId, '$description', $userId)")){
 			throw new Exception("The computer number could not be found. Please contact IT.");
 		}
 		echo json_encode(array());
@@ -375,20 +409,29 @@ function verify_pwd($user, $pwd) {
 
 function userTicketTable(){
 	$userId = '';//this will be the session
-
-	$result = config("conn")->query("CALL GetTicketsByUserId()");
+	$userId = $_SESSION["userId"];
+	$result = config("conn")->query("CALL GetTicketsByUserId('$userId')");
 
 	$table = "";
 
 	while ($row = $result->fetch()){
+		$ticketId = $row["TicketId"];
 		$table .= 
 		"<tr>
-			<td>".$row["FirstName"]."</td>
-			<td>".$row["LastName"]."</td>
-			<td>".$row["Username"]."</td>
-			<td>".$row["AccessLevel"]."</td>
+			<td><a id='ticket-$ticketId' href='#'>".$ticketId."</a></td>
+			<td>".$row["ComputerId"]."</td>
+			<td>".$row["DateSubmitted"]."</td>
+			<td>".$row["LocationName"]."</td>
 		</tr>";
 	}
 
 	echo $table;
+}
+
+function ticketDataModal($ticketNumber, $comment){
+	
+	//pull ticket data, check if data matches the user's userId, if not - redirect to 404.php
+
+	
+
 }

@@ -63,6 +63,8 @@
 		}else{
 			$result = config("conn")->query("CALL GetAccessLevelByUser('$user')")->fetch();
 			$_SESSION["accessLevel"] = $result["AccessLevel"];
+			$result = config("conn")->query("CALL GetUserId('$user')")->fetch();
+			$_SESSION["userId"] = $result["Id"];
 			$_SESSION["username"] = $user;
 			header('Location: index.php');
 		}
