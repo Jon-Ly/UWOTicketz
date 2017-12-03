@@ -372,6 +372,7 @@ function accessLevelList(){
 //////////////////////////////////////
 //              Login               //
 //////////////////////////////////////
+
 function generate_salt() {
    $iv = mcrypt_create_iv(22,MCRYPT_DEV_URANDOM);
    $encoded_iv = base64_encode($iv);
