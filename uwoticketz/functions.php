@@ -372,35 +372,62 @@ function accessLevelList(){
 //////////////////////////////////////
 //              Login               //
 //////////////////////////////////////
-function set_pwd($user, $pwd) {
-   $i =  password_hash($pwd, PASSWORD_DEFAULT);
+function generate_salt() {
+   $iv = mcrypt_create_iv(22,MCRYPT_DEV_URANDOM);
+   $encoded_iv = base64_encode($iv);
+   $encoded_iv = str_replace('+','.',$encoded_iv);
+   $salt = '$2y$10$' . $encoded_iv . '$';
+   return $salt;
+}
+
+function get_salt($user) {
+   global $db;
+   try {
+      $query = "SELECT Salt FROM user WHERE Username='$user'";
+      $stmt = $db->prepare($query);
+      $stmt->execute();
+      $s = $stmt->fetch(PDO::FETCH_ASSOC);
+      return $s['Salt'];
+   } catch (PDOException $e) {
+      db_disconnect();
+      exit("Aborting: There was a database error");
+   }
+}
+
+function verify_pwd($user, $password) {
+   global $db;
+   $ret = false;
+   $h = crypt($password, get_salt($user));
+	try {
+	 $query = "SELECT Password FROM user WHERE Username='$user'";
+	 $stmt = $db->prepare($query);
+	 $stmt->execute();
+	 $hash = $stmt->fetch(PDO::FETCH_ASSOC);
+	 $ret = $h === $hash['Password'] ? true : false;
+	} catch (PDOException $e) {
+	 db_disconnect();
+	 exit("Aborting: There was a database error when " .
+	 "verifying password");
+	}
+   return $ret;
+}
+
+function change_pwd($user, $pwd) {
+   global $db;
+   $s = generate_salt();
+   $i = crypt($pwd, $s);
    try{
-      $query = "UPDATE user SET Password=$i  WHERE Username=$user";
-      $stmt = config("conn")->prepare($query);
+      $query = "UPDATE user SET Password='$i'  WHERE Username='$user'";
+      $stmt = $db->prepare($query);
+      $stmt->execute();
+      $query = "UPDATE user SET Salt='$s'  WHERE Username='$user'";
+      $stmt = $db->prepare($query);
       $stmt->execute();
       return true;
    }catch (PDOException $e) {
       db_disconnect();
-      exit("Aborting: There was a database error when updating password");
+      exit("Aborting: There was a database error when changing password");
    }
-}
-
-/*
-	Returns false if query returned no results or if pwd doesn't match
-*/
-function verify_pwd($user, $pwd) {
-   $ret = false;
-      try {
-         $query = "SELECT Password FROM user WHERE Username=$user";
-         $stmt = config("conn")->prepare($query);
-         $stmt->execute();
-         $hash = $stmt->fetch(PDO::FETCH_ASSOC);
-         $ret = password_verify($pwd, $hash['Password']);
-      } catch (PDOException $e) {
-         db_disconnect();
-         exit("Aborting: There was a database error when verifying password");
-      }
-   return $ret;
 }
 
 //////////////////////////////////////
