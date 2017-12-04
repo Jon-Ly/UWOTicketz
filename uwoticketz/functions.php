@@ -518,11 +518,8 @@ function getTicketInformation($ticket_id){
 	echo json_encode($data);
 }
 
-<<<<<<< HEAD
+
 if(isset($_GET["ticket_id"])){
 	$ticket_id = $_GET["ticket_id"];
 	getTicketInformation($ticket_id);
 }
-=======
-}
->>>>>>> 4c228a4e3c712f0118729e3476281ec674b1b850
