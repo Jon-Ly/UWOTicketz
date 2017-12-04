@@ -9,7 +9,7 @@ $(document).ready(function () {
     * In the case you want error, just echo nothing.
     * As of now, unsure if you can do double ajax calls for php.
     */
-    $("#submitTicketButton").click(function (e) {
+    $("#submit_ticket_button").click(function (e) {
 
         var computerId = $("#computerId")[0].value;
         var description = $("#description")[0].value;
@@ -21,7 +21,7 @@ $(document).ready(function () {
                 dataType: 'json',
                 data: { computerId: computerId, description: description },
                 success: function (data) {
-
+                    
                 },
                 error: function (jqXHR, errorStatus, errorText) {
 

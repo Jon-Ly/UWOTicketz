@@ -17,7 +17,7 @@ $("#submitUserButton").click(function(e) {
 
     var successful = false;
 
-    if (firstName != "" && lastName != "" && username != "" && accessLevel >= 0 && validNames) {
+    if (firstName !== "" && lastName !== "" && username !== "" && accessLevel >= 0 && validNames) {
         $.ajax({
             type: "POST", //request type
             url: "functions.php", //the page containing php script

@@ -31,7 +31,7 @@ function config($key = '')
             '' => '',
             'computers' => 'Computers',
             'users' => 'Users',
-			'userTickets' => 'Past Tickets',
+			'userTickets' => 'Personal Tickets',
             'submit' => 'Submit Ticket',
 			'logout' => 'Logout'
         ],
@@ -39,7 +39,7 @@ function config($key = '')
 			'' => '',
 			'computers' => 'Computers',
             'users' => 'Users',
-			'userTickets' => 'Past Tickets',
+			'userTickets' => 'Personal Tickets',
             'submit' => 'Submit Ticket',
 			'logout' => 'Logout'
 		],

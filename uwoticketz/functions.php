@@ -32,7 +32,7 @@ function isAuditor(){
 }
 
 /*
-* Construct the navMenu and display.
+* Construct the navMenu and display it.
 */
 function navMenu(){
 	$navMenu = '';
@@ -130,6 +130,7 @@ function run(){
 * Construct the Tickets table.
 */
 function ticketTable(){
+
 	$result = config("conn")->query("CALL GetAllTickets()");
 
 	$statuses = config("conn")->query("CALL GetAllStatuses()");
@@ -139,9 +140,10 @@ function ticketTable(){
 	$table = "";
 
 	while ($row = $result->fetch()){
+		$ticketId = $row["Id"];
 		$table .= 
 		"<tr>
-			<td>".$row["Id"]."</td>
+			<td>$ticketId</td>
 			<td>".$row["ComputerId"]."</td>
 			<td>".$row["DateSubmitted"]."</td>
 			<td>".$row["DateCompleted"]."</td>";
@@ -153,6 +155,12 @@ function ticketTable(){
 
 		$table .=
 			"<td>".$row["Rating"]."</td>
+			<td>
+				<form id='view_ticket_form_$ticketId' method='GET'>
+					<input type='text' name='ticket_id' value='$ticketId'/ hidden aria-hidden='true'>
+					<button class='btn btn-info view_ticket_button' type='submit' id='view_ticket_button$ticketId'>View</button
+				</form>
+			</td>
 		</tr>";
 	}
 
@@ -408,30 +416,81 @@ function verify_pwd($user, $pwd) {
 //////////////////////////////////////
 
 function userTicketTable(){
-	$userId = '';//this will be the session
 	$userId = $_SESSION["userId"];
 	$result = config("conn")->query("CALL GetTicketsByUserId('$userId')");
 
 	$table = "";
 
+	$ticket_ids = array();
+
 	while ($row = $result->fetch()){
 		$ticketId = $row["TicketId"];
+		array_push($ticket_ids, $ticketId);
 		$table .= 
-		"<tr>
-			<td><a id='ticket-$ticketId' href='#'>".$ticketId."</a></td>
+		"<tr id='ticket-$ticketId'>
+			<td>".$ticketId."</td>
 			<td>".$row["ComputerId"]."</td>
 			<td>".$row["DateSubmitted"]."</td>
 			<td>".$row["LocationName"]."</td>
+			<td>
+				<form id='view_ticket_form_$ticketId' method='GET'>
+					<input type='text' name='ticket_id' value='$ticketId'/ hidden aria-hidden='true'>
+					<button class='btn btn-info view_ticket_button' type='submit' id='view_ticket_button$ticketId'>View</button
+				</form>
+			</td>
 		</tr>";
 	}
+
+	$_SESSION["ticket_ids"] = $ticket_ids;
 
 	echo $table;
 }
 
-function ticketDataModal($ticketNumber, $comment){
-	
+function insertComment($ticketNumber, $comment){
+	session_start();
 	//pull ticket data, check if data matches the user's userId, if not - redirect to 404.php
+	$userId = $_SESSION["userId"];
 
-	
+	try{
+		if(!config("conn")->query("CALL InsertComment($userId, $ticketNumber, '$comment')")){
+			throw new Exception("Unable to insert the new comment.");
+		}
 
+		$username = config("conn")->query("CALL GetUsernameById($userId)");
+
+		$datetime = config("conn")->query("SELECT CURRENT_TIMESTAMP");
+
+		$datetime = $datetime->fetch();
+		$ticketInfo = $username->fetch();
+
+		array_push($ticketInfo, $datetime["CURRENT_TIMESTAMP"]);
+
+		echo json_encode($ticketInfo);
+	}catch(Exception $e){
+		echo $e;
+	}
+}
+
+if(isset($_POST["ticket_id"]) && isset($_POST["comment"])){
+	$comment = $_POST["comment"];
+	$ticket_id = $_POST["ticket_id"];
+	insertComment($ticket_id, $comment);
+}
+
+function getTicketInformation($ticket_id){
+
+	$results = config("conn")->query("CALL GetTicketInformationById($ticket_id)");
+
+	$data = array();
+
+	while($row = $results->fetch()){
+		array_push($data, $row);
+	}
+
+	echo json_encode($data);
+}
+
+if(isset($_GET["ticket_id"])){
+	$ticket_id = $_GET["ticket_id"];
+	getTicketInformation($ticket_id);
 }

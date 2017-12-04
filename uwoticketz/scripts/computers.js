@@ -7,7 +7,7 @@ $("#submitComputerButton").click(function (e) {
     var computerId = $("#computerNumber")[0].value;
     var location = parseInt($("#location option:selected")[0].value);
 
-    if (computerId != "" && location != "") {
+    if (computerId !== "" && location !== "") {
         $.ajax({
             type: "POST", //request type
             url: "functions.php", //the page containing php script

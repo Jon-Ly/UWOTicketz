@@ -50,9 +50,9 @@
 						</div>
 						<div class="form-group">
 							<label>Description</label>
-							<textarea class="form-control" id="description" rows="12" name="description" placeholder="Issue Description" required novalidate></textarea>    
+							<textarea class="form-control" id="description" rows="12" name="description" placeholder="Issue Description" maxlength="600" required novalidate></textarea>    
 						</div>
-						<button class="btn btn-success floatRight" type="submit" id="submitTicketButton">Submit</button>
+						<button class="btn btn-success floatRight" type="submit" id="submit_ticket_button">Submit</button>
 						<button type="button" class="btn btn-default floatRight marginRight10px" data-dismiss="modal">Cancel</button>
 					</form>
 				</div>
