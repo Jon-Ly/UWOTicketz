@@ -100,7 +100,6 @@
 		}
 		return $ret;
 	}
-}
 ?>
 
 </body>
