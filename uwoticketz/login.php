@@ -55,10 +55,9 @@
 		$user = $_POST["username"];
 		$pass = $_POST["password"];
 
-		$result = config("conn")->query("CALL AuthenticateUser('$user', '$pass')");
-		$result = $result->fetch();
+		$isValidLogin = verify_pwd($user, $pass);
 
-		if($result == ""){
+		if($isValidLogin){
 			echo "<p class='redText'>Incorrect Login</p>";
 		}else{
 			$result = config("conn")->query("CALL GetAccessLevelByUser('$user')")->fetch();
@@ -69,6 +68,39 @@
 			header('Location: index.php');
 		}
 	}
+
+	function get_salt($user) {
+		global $db;
+		try {
+			$query = "SELECT Salt FROM user WHERE Username='$user'";
+			$stmt = $db->prepare($query);
+			$stmt->execute();
+			$s = $stmt->fetch(PDO::FETCH_ASSOC);
+			return $s['Salt'];
+		} catch (PDOException $e) {
+			db_disconnect();
+			exit("Aborting: There was a database error");
+		}
+	}
+
+	function verify_pwd($user, $password) {
+	    global $db;
+		$ret = false;
+		$h = crypt($password, get_salt($user));
+		try {
+			$query = "SELECT Password FROM user WHERE Username='$user'";
+			$stmt = $db->prepare($query);
+			$stmt->execute();
+			$hash = $stmt->fetch(PDO::FETCH_ASSOC);
+			$ret = $h === $hash['Password'] ? true : false;
+		} catch (PDOException $e) {
+			 db_disconnect();
+			 exit("Aborting: There was a database error when " .
+			 "verifying password");
+		}
+		return $ret;
+	}
+}
 ?>
 
 </body>

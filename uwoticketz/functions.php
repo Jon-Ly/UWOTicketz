@@ -404,21 +404,21 @@ function get_salt($user) {
 }
 
 function verify_pwd($user, $password) {
-   global $db;
-   $ret = false;
-   $h = crypt($password, get_salt($user));
+	global $db;
+	$ret = false;
+	$h = crypt($password, get_salt($user));
 	try {
-	 $query = "SELECT Password FROM user WHERE Username='$user'";
-	 $stmt = $db->prepare($query);
-	 $stmt->execute();
-	 $hash = $stmt->fetch(PDO::FETCH_ASSOC);
-	 $ret = $h === $hash['Password'] ? true : false;
+		$query = "SELECT Password FROM user WHERE Username='$user'";
+		$stmt = $db->prepare($query);
+		$stmt->execute();
+		$hash = $stmt->fetch(PDO::FETCH_ASSOC);
+		$ret = $h === $hash['Password'] ? true : false;
 	} catch (PDOException $e) {
-	 db_disconnect();
-	 exit("Aborting: There was a database error when " .
-	 "verifying password");
+		 db_disconnect();
+		 exit("Aborting: There was a database error when " .
+		 "verifying password");
 	}
-   return $ret;
+	return $ret;
 }
 
 function change_pwd($user, $pwd) {
