@@ -12,10 +12,10 @@ function config($key = '')
 	//Password is s0688747 (wooo look a password, super secure)
 	
 	//Server config
-	$host = "localhost";
+	$host = "softeng.cs.uwosh.edu";
 	$db = "lyj47";
 	$username = "lyj47";
-	$password = "";
+	$password = "s0688747";
 	$charset = 'utf8mb4';
 
 	$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
