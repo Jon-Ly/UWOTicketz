@@ -55,10 +55,8 @@
 		$user = $_POST["username"];
 		$pass = $_POST["password"];
 
-		//$isValidLogin = verify_pwd($user, $pass);
-
 		$isValidLogin = config("conn")->query("CALL AuthenticateUser('$user', '$pass')");
-		$isvalidLogin = $isValidLogin->fetch();
+		$isValidLogin = $isValidLogin->fetch();
 
 		if(!isset($isValidLogin)){
 			echo "<p class='redText'>Incorrect Login</p>";

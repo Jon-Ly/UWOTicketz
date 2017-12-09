@@ -15,7 +15,7 @@ function config($key = '')
 	$host = "localhost";
 	$db = "lyj47";
 	$username = "lyj47";
-	$password = "";
+	$password = "s0688747";
 	$charset = 'utf8mb4';
 
 	$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
