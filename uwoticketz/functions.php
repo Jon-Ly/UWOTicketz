@@ -148,10 +148,14 @@ function ticketTable(){
 			<td>".$row["DateSubmitted"]."</td>
 			<td>".$row["DateCompleted"]."</td>";
 
-			if(strtolower($row["StatusName"]) == "completed")
+			if(isAdmin()){
+				if(strtolower($row["StatusName"]) == "completed" || strtolower($row["StatusName"]) == "ignored")
+					$table.= ("<td><select class='form-control statusSelect' disabled><option>".$row["StatusName"]."</option></select></td>");
+				else
+					$table.= ("<td><select class='form-control statusSelect'>".buildStatusSelection($row["StatusName"], $statusData)."</select></td>");
+			}else if(isAuditor()){
 				$table.= ("<td><select class='form-control statusSelect' disabled><option>".$row["StatusName"]."</option></select></td>");
-			else
-				$table.= ("<td><select class='form-control statusSelect'>".buildStatusSelection($row["StatusName"], $statusData)."</select></td>");
+			}
 
 		$table .=
 			"<td>".$row["Rating"]."</td>
@@ -508,8 +512,11 @@ if(isset($_POST["ticket_id"]) && isset($_POST["comment"])){
 function getTicketInformation($ticket_id){
 
 	$results = config("conn")->query("CALL GetTicketInformationById($ticket_id)");
+	$user = config("conn")->query("CALL GetUserByTicket($ticket_id)")->fetch();
 
 	$data = array();
+
+	array_push($data, $user);
 
 	while($row = $results->fetch()){
 		array_push($data, $row);

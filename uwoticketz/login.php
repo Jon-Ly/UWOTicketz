@@ -55,9 +55,12 @@
 		$user = $_POST["username"];
 		$pass = $_POST["password"];
 
-		$isValidLogin = verify_pwd($user, $pass);
+		//$isValidLogin = verify_pwd($user, $pass);
 
-		if($isValidLogin){
+		$isValidLogin = config("conn")->query("CALL AuthenticateUser('$user', '$pass')");
+		$isvalidLogin = $isValidLogin->fetch();
+
+		if(!isset($isValidLogin)){
 			echo "<p class='redText'>Incorrect Login</p>";
 		}else{
 			$result = config("conn")->query("CALL GetAccessLevelByUser('$user')")->fetch();

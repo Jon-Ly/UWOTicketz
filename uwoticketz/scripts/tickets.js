@@ -4,7 +4,6 @@ $("document").ready(function () {
     */
     $("button.view_ticket_button").click(function (e) {
         var ticket_id = ($(this).closest("tr")[0].cells[0].textContent);
-        $("#ticket_id")[0].innerHTML = ticket_id;
 
         //e.preventDefault();
         $("#ticketDataModal").modal("show");
@@ -18,11 +17,12 @@ $("document").ready(function () {
                 success: function (data) {
                     var ticket_html =
                         "<div><p class='bold'>Problem Description:</p>" +
-                        "<p>" + data[0]["Description"] + "</p>" +
+                        "<p>" + data[1]["Description"] + "</p>" +
                         "</div> <hr> <p class='bold'>Comment Thread:</p> <div id='comment_thread'>";
-
-                    if (data[0]["Comment"] !== null) {
-                        for (var x = 0; x < data.length; x++) {
+                    //The data[0] holds the username for whomever submitted the ticket. The actual comments start at data[1].
+                    $("#ticket_id")[0].innerHTML = ticket_id + " - " + data[0]["Username"];
+                    if (typeof data[1]["Comment"] !== 'undefined') {
+                        for (var x = 1; x < data.length; x++) {
                             ticket_html +=
                                 "<blockquote class='blockquote marginLeft10px fontSize14px'>" + data[x]["Comment"] +
                                 "<footer class='blockquote-footer'><span class='marginRight10px' >" + data[x]["Username"] + "</span>" +
@@ -120,7 +120,7 @@ $("#submit_comment_button").click(function (e) {
             success: function (data) {
                 var ticket_html = $("#comment_thread")[0].innerHTML;
 
-                if (ticket_html !== "There are currently no comments") {
+                if ($("#comment_thread > p").length == 0) {
                     ticket_html +=
                         "<blockquote class='blockquote marginLeft10px fontSize14px'>" + comment +
                         "<footer class='blockquote-footer'><span class='marginRight10px'>" + data["Username"] + "</span>" +

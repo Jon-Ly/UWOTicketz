@@ -1,5 +1,8 @@
 <div class="container table-responsive">
-  <button type="button" class="btn btn-info btn-lg marginTop10px" data-toggle="modal" data-target="#addCompModal">Add Computer</button>
+  <?php
+	if(isAdmin()){?>
+		<button type="button" class="btn btn-info btn-lg marginTop10px" data-toggle="modal" data-target="#addCompModal">Add Computer</button>
+	<?php } ?>
 	<table class="table table-striped">
       <thead>
         <tr>

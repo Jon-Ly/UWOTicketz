@@ -1,14 +1,17 @@
 <div class="container">
-  <button type="button" class="btn btn-info btn-lg marginTop10px" data-toggle="modal" data-target="#addUserModal">Add User</button>
+	<?php
+	if(isAdmin()){?>
+		<button type="button" class="btn btn-info btn-lg marginTop10px" data-toggle="modal" data-target="#addUserModal">Add User</button>
+	<?php } ?>
 	<table class="table table-striped">
-      <thead>
-        <tr>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Username</th>
-		  <th>Access</th>
-        </tr>
-      </thead>
+		<thead>
+			<tr>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Username</th>
+				<th>Access</th>
+			</tr>
+		</thead>
       <tbody>
 		<?php userTable(); ?>
       </tbody>
