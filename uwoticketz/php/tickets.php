@@ -1,5 +1,5 @@
 <div class="container">
-	<table class="table table-striped">
+	<table class="table table-striped" id="tickets_table">
       <thead>
         <tr>
           <th>Ticket Number</th>

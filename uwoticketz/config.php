@@ -15,7 +15,7 @@ function config($key = '')
 	$host = "localhost";
 	$db = "lyj47";
 	$username = "lyj47";
-	$password = "s0688747";
+	$password = "";
 	$charset = 'utf8mb4';
 
 	$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
@@ -27,7 +27,7 @@ function config($key = '')
 	//View config
     $config = [
         'name' => 'UWO Ticketz',
-        'nav_menu' => [ //default is IT.
+        'it_nav_menu' => [
             '' => '',
             'computers' => 'Computers',
             'users' => 'Users',
@@ -37,8 +37,6 @@ function config($key = '')
         ],
 		'auditor_nav_menu' => [
 			'' => '',
-			'computers' => 'Computers',
-            'users' => 'Users',
 			'userTickets' => 'Personal Tickets',
             'submit' => 'Submit Ticket',
 			'logout' => 'Logout'

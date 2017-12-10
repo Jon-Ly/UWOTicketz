@@ -38,7 +38,7 @@ function navMenu(){
 	$navMenu = '';
 
 	if(strtolower($_SESSION["accessLevel"]) == "it"){
-		foreach (config('nav_menu') as $uri => $name) {
+		foreach (config('it_nav_menu') as $uri => $name) {
 			if($uri != "submit")
 				$navMenu .= "<li class='nav-item marginRight10px bold'><a class='nav-link' href='?page=".$uri."'>".$name."</li></a>";
 			else
@@ -130,7 +130,6 @@ function run(){
 * Construct the Tickets table.
 */
 function ticketTable(){
-
 	$result = config("conn")->query("CALL GetAllTickets()");
 
 	$statuses = config("conn")->query("CALL GetAllStatuses()");
@@ -151,6 +150,9 @@ function ticketTable(){
 			if(isAdmin()){
 				if(strtolower($row["StatusName"]) == "completed" || strtolower($row["StatusName"]) == "ignored")
 					$table.= ("<td><select class='form-control statusSelect' disabled><option>".$row["StatusName"]."</option></select></td>");
+				else if($row["UserAssignedId"] != null && $_SESSION['userId'] != $row["UserAssignedId"]){
+					$table.= ("<td><select class='form-control statusSelect' disabled><option>".$row["StatusName"]."</option></select></td>");
+				}
 				else
 					$table.= ("<td><select class='form-control statusSelect'>".buildStatusSelection($row["StatusName"], $statusData)."</select></td>");
 			}else if(isAuditor()){
@@ -161,8 +163,8 @@ function ticketTable(){
 			"<td>".$row["Rating"]."</td>
 			<td>
 				<form id='view_ticket_form_$ticketId' method='GET'>
-					<input type='text' name='ticket_id' value='$ticketId'/ hidden aria-hidden='true'>
-					<button class='btn btn-info view_ticket_button' type='submit' id='view_ticket_button$ticketId'>View</button
+					<input type='text' name='ticket_id' value='$ticketId' hidden aria-hidden='true'/>
+					<button class='btn btn-info view_ticket_button' type='submit' id='view_ticket_button$ticketId'>View</button>
 				</form>
 			</td>
 		</tr>";
@@ -236,7 +238,15 @@ function insertTicket($computerId, $description){
 		if(!config("conn")->query("CALL InsertTicket($computerId, '$description', $userId)")){
 			throw new Exception("The computer number could not be found. Please contact IT.");
 		}
-		echo json_encode(array());
+		$result = config("conn")->query("CALL GetTicketsByUserId($userId)");
+
+		$arr = array();
+
+		while($row = $result->fetch()){
+			array_push($arr, $row);
+		}
+
+		echo json_encode($arr);
 	}catch(Exception $e){
 		echo $e;
 	}
@@ -258,10 +268,28 @@ function computerTable(){
 	$table = "";
 
 	while ($row = $result->fetch()){
+		$id = $row["Id"];
+		$location = $row["LocationName"];
 		$table .= 
 		"<tr>
-			<td>".$row["Id"]."</td>
-			<td>".$row["LocationName"]."</td>
+			<td>".$id."</td>
+			<td>".$location."</td>";
+
+		$table .=
+			"<td>
+				<form id='edit_computer_form_$id' method='POST'>
+					<input type='text' name='computer_id' value='$id' hidden aria-hidden='true'/>
+					<button class='btn btn-info edit_computer_button' type='submit' id='edit_computer_button_$id'>Edit</button>
+				</form>
+			</td>";
+
+		$table .=
+			"<td>
+				<form id='delete_computer_form_$id' method='POST'>
+					<input type='text' name='computer_id' value='$id' hidden aria-hidden='true'/>
+					<button class='btn btn-info remove_computer_button' type='submit' id='delete_computer_button_$id'>Delete</button>
+				</form>
+			</td>
 		</tr>";
 	}
 

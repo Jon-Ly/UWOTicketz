@@ -3,6 +3,8 @@ body {background: #eee !important;}
 
 fieldset{border: 1px solid black;}
 
+/*button{width: 100px;}*/
+
 legend{
     width: inherit;
     padding: 0 10px;
