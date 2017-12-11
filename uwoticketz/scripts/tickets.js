@@ -40,8 +40,8 @@ $("tbody").on("click", "button.view_ticket_button", function (e) {
 
                 $(".ticket_information")[0].innerHTML = ticket_html;
 
-                //disable the comments if the ticket is completed, for Users
-                if (data[1]["Status"] > 3) {
+                //disable the comments if the ticket is completed
+                if (data[1]["Status"] >= 3) {
                     $("#user_comment").attr("disabled", "disabled");
                 } else {
                     $("#user_comment").removeAttr("disabled");

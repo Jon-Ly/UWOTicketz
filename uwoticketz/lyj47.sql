@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 11, 2017 at 06:37 AM
+-- Generation Time: Dec 11, 2017 at 07:09 AM
 -- Server version: 10.1.26-MariaDB
 -- PHP Version: 7.1.9
 
@@ -251,10 +251,23 @@ WHERE
 	ticket.Id = ticketId$$
 
 CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertTicket` (IN `computerId` INT(11) UNSIGNED, IN `description` VARCHAR(500), IN `userId` INT(11) UNSIGNED)  MODIFIES SQL DATA
+IF NOT EXISTS(
+	SELECT
+    	*
+    FROM
+    	ticket
+    WHERE
+    	ticket.ComputerId = computerId
+    	AND
+    	ticket.UserId = userId
+    	AND
+    	(ticket.Status <> 3 OR ticket.Status <> 4)
+) THEN
 INSERT INTO ticket
 	(ComputerId, UserId, DateSubmitted, Description, Status)
 VALUES
-	(computerId, userId, CURRENT_TIMESTAMP, description, 1)$$
+	(computerId, userId, CURRENT_TIMESTAMP, description, 1);
+END IF$$
 
 CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertUser` (IN `firstName` VARCHAR(25), IN `lastName` VARCHAR(25), IN `username` VARCHAR(10), IN `accessLevel` INT(11))  NO SQL
 INSERT INTO user
@@ -370,6 +383,7 @@ INSERT INTO `computer` (`Id`, `LocationId`) VALUES
 (117, 7),
 (118, 8),
 (116, 11),
+(110, 12),
 (115, 14),
 (113, 18);
 
@@ -470,8 +484,7 @@ CREATE TABLE `user` (
 INSERT INTO `user` (`Id`, `FirstName`, `LastName`, `AccessLevelId`, `Password`, `Username`, `Archived`) VALUES
 (11, 'Admin', 'Admin', 1, '$2y$10$nrObYbZser5/5DWwuYaZBO1M/29my2MFJoQuhSXy9HHDde7pPFXle', 'Admin', 0),
 (14, 'Auditor', 'Auditor', 2, '$2y$10$oue6gqqXh.YMcnVWLxFXxuOGyiupPA8kwCGUeL5Nt2fXDYz29RDqO', 'Auditor', 0),
-(15, 'User', 'User', 0, '$2y$10$wcojZntBdu268rVAH6dHJOB5NFVMPbVwrkrgbPoywcW7GrfPWphse', 'User', 0),
-(16, 'Test', 'Test', 0, '$2y$10$aPY5ZzMrtCmkvgZ0zjbJjOtla0D9AwyXiVZc5KYwGLoe//Bx1fdJC', 'Test', 0);
+(15, 'User', 'User', 0, '$2y$10$wcojZntBdu268rVAH6dHJOB5NFVMPbVwrkrgbPoywcW7GrfPWphse', 'User', 0);
 
 --
 -- Indexes for dumped tables
@@ -535,7 +548,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `location`
@@ -547,13 +560,13 @@ ALTER TABLE `location`
 -- AUTO_INCREMENT for table `ticket`
 --
 ALTER TABLE `ticket`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Constraints for dumped tables

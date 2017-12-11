@@ -13,7 +13,6 @@ $(document).ready(function () {
 
         var computer_id = $("#computer_id")[0].value;
         var description = $("#description")[0].value;
-        var successful = false;
 
         if (computer_id != "" && description != "") {
             $.ajax({
@@ -22,8 +21,8 @@ $(document).ready(function () {
                 dataType: 'json',
                 data: { computer_id: computer_id, description: description },
                 success: function (data) {
-                    $("#tickets_table > tbody")[0].innerHTML = data[0];
-                    successful = true;
+                    if(typeof $("#tickets_table > tbody")[0] !== "undefined")
+                        $("#tickets_table > tbody")[0].innerHTML = data[0];
                 },
                 error: function (jqXHR, errorStatus, errorText) {console.log(jqXHR)},
                 complete: function () {

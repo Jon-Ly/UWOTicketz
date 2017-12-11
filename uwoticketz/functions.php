@@ -251,6 +251,7 @@ if(isset($_POST["ticket_number"]) && isset($_POST["statusId"]) && isset($_POST["
 	$statusId = $_POST["statusId"];
 	$statusName = $_POST["statusName"];
 	updateTicketStatus($ticket_number, $statusId, $statusName);
+	return true;
 }
 
 //////////////////////////////////////
@@ -289,6 +290,7 @@ if(isset($_POST["computer_id"]) && isset($_POST["description"])){
 	$computer_id = $_POST["computer_id"];
 	$description = $_POST["description"];
 	insertTicket($computer_id, $description);
+	return true;
 }
 
 //////////////////////////////////////
@@ -382,6 +384,7 @@ if(isset($_POST["computer_number"]) && isset($_POST["location"])){
 	$computer_id = $_POST["computer_number"];
 	$location = $_POST["location"];
 	insertComputer($computer_id, $location);
+	return true;
 }
 
 /*
@@ -414,12 +417,14 @@ if(isset($_POST["computer_id"]) && isset($_POST["location"]) && isset($_POST["pr
 	$computer_id = addslashes($_POST["computer_id"]);
 	$location = addslashes($_POST["location"]);
 	$previous_computer_id = addslashes($_POST["previous_computer_id"]);
-	updateComputer($computer_id, $location, $previous_computer_id); 
+	updateComputer($computer_id, $location, $previous_computer_id);
+	return true;
 }
 //check if the user is deleting a computer.
 else if(isset($_POST["computer_id"])){
 	$computer_id = addslashes($_POST["computer_id"]);
 	deleteComputer($computer_id);
+	return true;
 }
 
 /*
@@ -462,6 +467,7 @@ function getComputerById($computer_id){
 if(isset($_GET["computer_id"])){
 	$computer_id = $_GET["computer_id"];
 	getComputerById($computer_id);
+	return true;
 }
 //////////////////////////////////////
 //              Users               //
@@ -526,6 +532,7 @@ if(isset($_POST["first_name"]) && isset($_POST["last_name"]) && isset($_POST["us
 	$username = $_POST["username"];
 	$access_level = $_POST["access_level"];
 	insertUser($first_name, $last_name, $username, $access_level);
+	return true;
 }
 
 /*
@@ -672,17 +679,20 @@ if(isset($_POST["ticket_id"]) && isset($_POST["comment"])){
 	$comment = $_POST["comment"];
 	$ticket_id = $_POST["ticket_id"];
 	insertComment($ticket_id, $comment);
+	return true;
 }
 //check if a user is inserting a new rating.
 else if(isset($_POST["ticket_id"]) && isset($_POST["rating"])){
 	$ticket_id = addslashes($_POST["ticket_id"]);
 	$rating = addslashes($_POST["rating"]);
 	insertRating($ticket_id, $rating);
+	return true;
 }
 //check if a user is getting ticket data
 else if(isset($_GET["ticket_id"])){
 	$ticket_id = $_GET["ticket_id"];
 	getTicketInformation($ticket_id);
+	return true;
 }
 
 /*
