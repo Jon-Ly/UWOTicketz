@@ -12,23 +12,30 @@ $timeout_duration = 1200; //20 minute session duration
 if(isset($_SESSION["last_activity"]) &&
 	($time - $_SESSION["last_activity"]) > $timeout_duration){
 	
-	header('location: login.php');
+	session_unset();
+	session_destroy();
+
+	header('Location: login.php');
 }
 
+//reset timeout to 20 mins if user did an action
 $_SESSION['last_activity'] = $time;
 
 //////////////////////////////////////
 //             General              //
 //////////////////////////////////////
 
+/**
+* The different permission levels
+*/
 function isAdmin(){
-	return (isset($_SESSION["accessLevel"]) && strtolower($_SESSION["accessLevel"]) == "it");
+	return (isset($_SESSION["access_level"]) && strtolower($_SESSION["access_level"]) == "it");
 }
 function isUser(){
-	return (isset($_SESSION["accessLevel"]) && strtolower($_SESSION["accessLevel"]) == "user");
+	return (isset($_SESSION["access_level"]) && strtolower($_SESSION["access_level"]) == "user");
 }
 function isAuditor(){
-	return (isset($_SESSION["accessLevel"]) && strtolower($_SESSION["accessLevel"]) == "auditor");
+	return (isset($_SESSION["access_level"]) && strtolower($_SESSION["access_level"]) == "auditor");
 }
 
 /*
@@ -37,31 +44,31 @@ function isAuditor(){
 function navMenu(){
 	$navMenu = '';
 
-	if(strtolower($_SESSION["accessLevel"]) == "it"){
+	if(strtolower($_SESSION["access_level"]) == "it"){
 		foreach (config('it_nav_menu') as $uri => $name) {
 			if($uri != "submit")
 				$navMenu .= "<li class='nav-item marginRight10px bold'><a class='nav-link' href='?page=".$uri."'>".$name."</li></a>";
 			else
 				$navMenu .= "<li class='nav-item'><a class='nav-link bold' data-toggle='modal' data-target='#submitTicketModal' href='#'>".$name."</li></a>";
 		}
-	}else if(strtolower($_SESSION["accessLevel"]) == "user"){
+	}else if(strtolower($_SESSION["access_level"]) == "user"){
 		foreach (config('user_nav_menu') as $uri => $name) {
 			if($uri != "submit")
 				$navMenu .= "<li class='nav-item marginRight10px bold'><a class='nav-link' href='?page=".$uri."'>".$name."</li></a>";
 			else
 				$navMenu .= "<li class='nav-item'><a class='nav-link bold' data-toggle='modal' data-target='#submitTicketModal' href='#'>".$name."</li></a>";
 		}
-	}else if(strtolower($_SESSION["accessLevel"]) == "auditor"){
+	}else if(strtolower($_SESSION["access_level"]) == "auditor"){
 		foreach (config('auditor_nav_menu') as $uri => $name) {
 			if($uri != "submit")
 				$navMenu .= "<li class='nav-item marginRight10px bold'><a class='nav-link' href='?page=".$uri."'>".$name."</li></a>";
 			else
 				$navMenu .= "<li class='nav-item'><a class='nav-link bold' data-toggle='modal' data-target='#submitTicketModal' href='#'>".$name."</li></a>";
 		}
-	}else{
+	}else{ //not logged in
 		header('location: login.php');
 	}
-
+	
 	echo $navMenu;
 }
 
@@ -136,6 +143,7 @@ function ticketTable(){
 
 /**
 * Set up like this so other functions can call this and get an update table.
+* Construct the ticket table html
 */
 function constructTicketTable(){
 	$result = config("conn")->query("CALL GetAllTickets()");
@@ -147,10 +155,10 @@ function constructTicketTable(){
 	$table = "";
 
 	while ($row = $result->fetch()){
-		$ticketId = $row["Id"];
+		$ticket_id = $row["Id"];
 		$table .= 
 		"<tr>
-			<td>$ticketId</td>
+			<td>$ticket_id</td>
 			<td>".$row["ComputerId"]."</td>
 			<td>".$row["DateSubmitted"]."</td>
 			<td>".$row["DateCompleted"]."</td>";
@@ -158,7 +166,7 @@ function constructTicketTable(){
 			if(isAdmin()){
 				if(strtolower($row["StatusName"]) == "completed" || strtolower($row["StatusName"]) == "ignored")
 					$table.= ("<td><select class='form-control statusSelect' disabled><option>".$row["StatusName"]."</option></select></td>");
-				else if($row["UserAssignedId"] != null && $_SESSION['userId'] != $row["UserAssignedId"]){
+				else if($row["UserAssignedId"] != null && $_SESSION['user_id'] != $row["UserAssignedId"]){
 					$table.= ("<td><select class='form-control statusSelect' disabled><option>".$row["StatusName"]."</option></select></td>");
 				}
 				else
@@ -184,9 +192,9 @@ function constructTicketTable(){
 
 		$table .=
 			"<td>
-				<form id='view_ticket_form_$ticketId' method='GET'>
-					<input type='text' name='ticket_id' value='$ticketId' hidden aria-hidden='true'/>
-					<button class='btn btn-info view_ticket_button' type='submit' id='view_ticket_button_$ticketId'>View</button>
+				<form id='view_ticket_form_$ticket_id' method='GET'>
+					<input type='text' name='ticket_id' value='$ticket_id' hidden aria-hidden='true'/>
+					<button class='btn btn-info view_ticket_button' type='submit' id='view_ticket_button_$ticket_id'>View</button>
 				</form>
 			</td>
 		</tr>";
@@ -220,14 +228,14 @@ function buildStatusSelection($statusName, $statuses){
 /**
 * This triggers when an admin changes the status of a ticket on the front page.
 */
-function updateTicketStatus($ticketNumber, $statusId, $statusName){
+function updateTicketStatus($ticket_number, $statusId, $statusName){
 	session_start();
 	try{		
-		if(!config("conn")->query("CALL UpdateTicketStatus($ticketNumber, $statusId, '$statusName', ".$_SESSION["userId"].")")){
+		if(!config("conn")->query("CALL UpdateTicketStatus($ticket_number, $statusId, '$statusName', ".$_SESSION["user_id"].")")){
 			throw new Exception("Unable to change the status of that ticket.");
 		}
 
-		$result = config("conn")->query("CALL GetTimeStampForTicket($ticketNumber)");
+		$result = config("conn")->query("CALL GetTimeStampForTicket($ticket_number)");
 
 		$row = $result->fetch();
 
@@ -237,11 +245,12 @@ function updateTicketStatus($ticketNumber, $statusId, $statusName){
 	}
 }
 
-if(isset($_POST["ticketNumber"]) && isset($_POST["statusId"]) && isset($_POST["statusName"])){
-	$ticketNumber = $_POST["ticketNumber"];
+//Check if the user is updating a ticket.
+if(isset($_POST["ticket_number"]) && isset($_POST["statusId"]) && isset($_POST["statusName"])){
+	$ticket_number = $_POST["ticket_number"];
 	$statusId = $_POST["statusId"];
 	$statusName = $_POST["statusName"];
-	updateTicketStatus($ticketNumber, $statusId, $statusName);
+	updateTicketStatus($ticket_number, $statusId, $statusName);
 }
 
 //////////////////////////////////////
@@ -251,14 +260,14 @@ if(isset($_POST["ticketNumber"]) && isset($_POST["statusId"]) && isset($_POST["s
 /*
 * Inserts a new ticket.
 *
-* @computerId int
+* @computer_id int
 * @description string
 */
-function insertTicket($computerId, $description){
+function insertTicket($computer_id, $description){
 	session_start();
-	$userId = $_SESSION["userId"];
+	$user_id = $_SESSION["user_id"];
 	try{
-		if(!config("conn")->query("CALL InsertTicket($computerId, '$description', $userId)")){
+		if(!config("conn")->query("CALL InsertTicket($computer_id, '$description', $user_id)")){
 			throw new Exception("The computer number could not be found. Please contact IT.");
 		}
 
@@ -275,20 +284,27 @@ function insertTicket($computerId, $description){
 	}
 }
 
-if(isset($_POST["computerId"]) && isset($_POST["description"])){
-	$computerId = $_POST["computerId"];
+//check if a user is inserting a ticket
+if(isset($_POST["computer_id"]) && isset($_POST["description"])){
+	$computer_id = $_POST["computer_id"];
 	$description = $_POST["description"];
-	insertTicket($computerId, $description);
+	insertTicket($computer_id, $description);
 }
 
 //////////////////////////////////////
 //             Computers            //
 //////////////////////////////////////
 
+/*
+* Display the computer table
+*/
 function computerTable(){
 	echo constructComputerTable();
 }
 
+/*
+* Construct the computer table html.
+*/
 function constructComputerTable(){
 	$result = config("conn")->query("CALL GetAllComputers()");
 
@@ -323,6 +339,9 @@ function constructComputerTable(){
 	return $table;
 }
 
+/*
+* Returns a list of locations
+*/
 function getLocationList(){
 	$result = config("conn")->query("CALL GetAllLocations()");
 
@@ -341,9 +360,15 @@ function getLocationList(){
 	echo $selection;
 }
 
-function insertComputer($computerId, $location){
+/*
+* Inserts a computer.
+*
+* @computer_id int
+* @location int
+*/
+function insertComputer($computer_id, $location){
 	try{
-		if(!config("conn")->query("CALL InsertComputer($computerId, $location)")){
+		if(!config("conn")->query("CALL InsertComputer($computer_id, $location)")){
 			throw new Exception("The computer could not be entered.");
 		}
 		echo json_encode(array());
@@ -352,12 +377,20 @@ function insertComputer($computerId, $location){
 	}
 }
 
-if(isset($_POST["computerNumber"]) && isset($_POST["location"])){
-	$computerId = $_POST["computerNumber"];
+//checks if the user is inserting a computer
+if(isset($_POST["computer_number"]) && isset($_POST["location"])){
+	$computer_id = $_POST["computer_number"];
 	$location = $_POST["location"];
-	insertComputer($computerId, $location);
+	insertComputer($computer_id, $location);
 }
 
+/*
+* Updates a computer's data.
+*
+* @computer_id int
+* @location int
+* @previous_computer_id int
+*/
 function updateComputer($computer_id, $location, $previous_computer_id){
 	
 	try{
@@ -376,17 +409,24 @@ function updateComputer($computer_id, $location, $previous_computer_id){
 	}
 }
 
+//check if the user is updating computer data
 if(isset($_POST["computer_id"]) && isset($_POST["location"]) && isset($_POST["previous_computer_id"])){
 	$computer_id = addslashes($_POST["computer_id"]);
 	$location = addslashes($_POST["location"]);
 	$previous_computer_id = addslashes($_POST["previous_computer_id"]);
 	updateComputer($computer_id, $location, $previous_computer_id); 
 }
+//check if the user is deleting a computer.
 else if(isset($_POST["computer_id"])){
 	$computer_id = addslashes($_POST["computer_id"]);
 	deleteComputer($computer_id);
 }
 
+/*
+* Delets a computer by its number.
+*
+* @computer_id int
+*/
 function deleteComputer($computer_id){
 	try{
 		if(!config("conn")->query("CALL DeleteComputer($computer_id)")){
@@ -404,32 +444,39 @@ function deleteComputer($computer_id){
 }
 
 /*
-* Gets a computer by computerId
+* Gets a computer by computer_id
 *
-* @computerId int
+* @computer_id int
 * @description string
 */
-function getComputerById($computerId){
+function getComputerById($computer_id){
 	
-	$result = config("conn")->query("CALL GetComputerById($computerId)");
+	$result = config("conn")->query("CALL GetComputerById($computer_id)");
 
 	$row = $result->fetch();
 
 	echo json_encode($row);
 }
 
-if(isset($_GET["computerId"])){
-	$computerId = $_GET["computerId"];
-	getComputerById($computerId);
+//check if a user is computer data
+if(isset($_GET["computer_id"])){
+	$computer_id = $_GET["computer_id"];
+	getComputerById($computer_id);
 }
 //////////////////////////////////////
 //              Users               //
 //////////////////////////////////////
 
+/*
+* displays the users table.
+*/
 function userTable(){
 	echo constructUserTable();
 }
 
+/*
+* constructs the user table html.
+*/
 function constructUserTable(){
 	$result = config("conn")->query("CALL GetAllUsers()");
 
@@ -448,10 +495,18 @@ function constructUserTable(){
 	return $table;
 }
 
-function insertUser($firstName, $lastName, $username, $accessLevel){
+/*
+* Inserts a new user.
+*
+* @first_name string
+* @last_name string
+* @username string
+* @access_level int
+*/
+function insertUser($first_name, $last_name, $username, $access_level){
 
 	try{
-		if(!config("conn")->query("CALL InsertUser('$firstName', '$lastName', '$username', $accessLevel)")){
+		if(!config("conn")->query("CALL InsertUser('$first_name', '$last_name', '$username', $access_level)")){
 			throw new Exception("The user could not be entered.");
 		}
 		
@@ -464,14 +519,18 @@ function insertUser($firstName, $lastName, $username, $accessLevel){
 	}
 }
 
-if(isset($_POST["firstName"]) && isset($_POST["lastName"]) && isset($_POST["username"]) && isset($_POST["accessLevel"])){
-	$firstName = $_POST["firstName"];
-	$lastName = $_POST["lastName"];
+//check if a user wants to insert a user.
+if(isset($_POST["first_name"]) && isset($_POST["last_name"]) && isset($_POST["username"]) && isset($_POST["access_level"])){
+	$first_name = $_POST["first_name"];
+	$last_name = $_POST["last_name"];
 	$username = $_POST["username"];
-	$accessLevel = $_POST["accessLevel"];
-	insertUser($firstName, $lastName, $username, $accessLevel);
+	$access_level = $_POST["access_level"];
+	insertUser($first_name, $last_name, $username, $access_level);
 }
 
+/*
+* Returns a list of the access levels
+*/
 function accessLevelList(){
 	$result = config("conn")->query("CALL GetAllAccessLevels()");
 
@@ -494,21 +553,27 @@ function accessLevelList(){
 //          User Tickets            //
 //////////////////////////////////////
 
+/*
+* displays user ticket table
+*/
 function userTicketTable(){
 	echo constructUserTicketTable();
 }
 
+/*
+* constructs the user ticket table html
+*/
 function constructUserTicketTable(){
-	$userId = $_SESSION["userId"];
-	$result = config("conn")->query("CALL GetTicketsByUserId('$userId')");
+	$user_id = $_SESSION["user_id"];
+	$result = config("conn")->query("CALL GetTicketsByUserId('$user_id')");
 
 	$table = "";
 
 	while ($row = $result->fetch()){
-		$ticketId = $row["TicketId"];
+		$ticket_id = $row["TicketId"];
 		$table .= 
-		"<tr id='ticket-$ticketId'>
-			<td>".$ticketId."</td>
+		"<tr id='ticket-$ticket_id'>
+			<td>".$ticket_id."</td>
 			<td>".$row["ComputerId"]."</td>
 			<td>".$row["DateSubmitted"]."</td>
 			<td>".$row["LocationName"]."</td>";
@@ -537,9 +602,9 @@ function constructUserTicketTable(){
 		}
 		$table .=
 			"<td>
-				<form id='view_ticket_form_$ticketId' method='GET'>
-					<input type='text' name='ticket_id' value='$ticketId'/ hidden aria-hidden='true'>
-					<button class='btn btn-info view_ticket_button' type='submit' id='view_ticket_button_$ticketId'>View</button
+				<form id='view_ticket_form_$ticket_id' method='GET'>
+					<input type='text' name='ticket_id' value='$ticket_id'/ hidden aria-hidden='true'>
+					<button class='btn btn-info view_ticket_button' type='submit' id='view_ticket_button_$ticket_id'>View</button
 				</form>
 			</td>
 		</tr>";
@@ -548,31 +613,43 @@ function constructUserTicketTable(){
 	return $table;
 }
 
-function insertComment($ticketNumber, $comment){
+/**
+* Inserts a comment
+*
+* @ticket_number int
+* @comment string
+*/
+function insertComment($ticket_number, $comment){
 	session_start();
-	//pull ticket data, check if data matches the user's userId, if not - redirect to 404.php
-	$userId = $_SESSION["userId"];
+	//pull ticket data, check if data matches the user's user_id, if not - redirect to 404.php
+	$user_id = $_SESSION["user_id"];
 
 	try{
-		if(!config("conn")->query("CALL InsertComment($userId, $ticketNumber, '$comment')")){
+		if(!config("conn")->query("CALL InsertComment($user_id, $ticket_number, '$comment')")){
 			throw new Exception("Unable to insert the new comment.");
 		}
 
-		$username = config("conn")->query("CALL GetUsernameById($userId)");
+		$username = config("conn")->query("CALL GetUsernameById($user_id)");
 
 		$datetime = config("conn")->query("SELECT CURRENT_TIMESTAMP");
 
 		$datetime = $datetime->fetch();
-		$ticketInfo = $username->fetch();
+		$ticket_info = $username->fetch();
 
-		array_push($ticketInfo, $datetime["CURRENT_TIMESTAMP"]);
+		array_push($ticket_info, $datetime["CURRENT_TIMESTAMP"]);
 
-		echo json_encode($ticketInfo);
+		echo json_encode($ticket_info);
 	}catch(Exception $e){
 		echo $e;
 	}
 }
 
+/*
+* Inserts a ticket rating.
+*
+* @ticket_id int
+* @rating int
+*/
 function insertRating($ticket_id, $rating){
 	session_start();
 	try{
@@ -590,21 +667,29 @@ function insertRating($ticket_id, $rating){
 	}
 }
 
+//check if a user is inserting a new comment.
 if(isset($_POST["ticket_id"]) && isset($_POST["comment"])){
 	$comment = $_POST["comment"];
 	$ticket_id = $_POST["ticket_id"];
 	insertComment($ticket_id, $comment);
 }
+//check if a user is inserting a new rating.
 else if(isset($_POST["ticket_id"]) && isset($_POST["rating"])){
 	$ticket_id = addslashes($_POST["ticket_id"]);
 	$rating = addslashes($_POST["rating"]);
 	insertRating($ticket_id, $rating);
 }
+//check if a user is getting ticket data
 else if(isset($_GET["ticket_id"])){
 	$ticket_id = $_GET["ticket_id"];
 	getTicketInformation($ticket_id);
 }
 
+/*
+* Returns ticket information for a given ticket number.
+*
+* @ticket_id
+*/
 function getTicketInformation($ticket_id){
 	$results = config("conn")->query("CALL GetTicketInformationById($ticket_id)");
 	$user = config("conn")->query("CALL GetUserByTicket($ticket_id)")->fetch();
@@ -624,6 +709,10 @@ function getTicketInformation($ticket_id){
 //             Reports              //
 //////////////////////////////////////
 
+/*
+* Generates a new report.
+* --INCOMPLETE--
+*/
 function generateReport(){
 	$result = config("conn")->query("CALL GetReportData()");
 

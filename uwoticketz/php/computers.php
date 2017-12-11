@@ -17,6 +17,7 @@
     </table>
 </div>
 
+<!-- Add Modal -->
 <div class="container">
 	  <div class="modal fade" id="addCompModal" role="dialog">
 			<div class="modal-dialog">
@@ -29,7 +30,7 @@
 							  <form id="addComputerForm" method="POST">
 									<div class="form-group">
 										<label>Computer Number</label>
-										<input type="text" class="form-control numeric" id="computerNumberAdd" name="computerNumber" maxlength="5" autofocus required novalidate />
+										<input type="text" class="form-control numeric" id="computer_numberAdd" name="computer_number" maxlength="5" autofocus required novalidate />
 									</div>
 									<div class="form-group">
 										<label>Location</label>
@@ -46,6 +47,7 @@
 	  </div>
 </div>
 
+<!-- Edit Modal -->
 <div class="modal fade" id="edit_comp_modal" role="dialog">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -57,7 +59,7 @@
 				  <form id="edit_computer_form" method="POST">
 						<div class="form-group">
 							<label>Computer Number</label>
-							<input type="text" class="form-control numeric" id="computerNumberEdit" name="computerNumber" maxlength="5" autofocus required novalidate />
+							<input type="text" class="form-control numeric" id="computer_numberEdit" name="computer_number" maxlength="5" autofocus required novalidate />
 						</div>
 						<div class="form-group">
 							<label>Location</label>

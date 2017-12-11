@@ -7,6 +7,8 @@ $("document").ready(function () {
 $("tbody").on("click", "button.view_ticket_button", function (e) {
     var ticket_id = ($(this).closest("tr")[0].cells[0].textContent);
 
+    var successful = false;
+
     //e.preventDefault();
     $("#ticketDataModal").modal("show");
 
@@ -38,17 +40,23 @@ $("tbody").on("click", "button.view_ticket_button", function (e) {
 
                 $(".ticket_information")[0].innerHTML = ticket_html;
 
+                //disable the comments if the ticket is completed, for Users
                 if (data[1]["Status"] > 3) {
                     $("#user_comment").attr("disabled", "disabled");
                 } else {
                     $("#user_comment").removeAttr("disabled");
                 }
+
+                successful = true;
             },
             error: function (jqXHR, errorStatus, errorText) {
 
             },
             complete: function () {
-
+                if (successful) {
+                    e.preventDefault();
+                    $('#ticketDataModal').modal('toggle');
+                }
             }
         });
     } else {
@@ -75,7 +83,7 @@ $("tbody").on("change", ".statusSelect", function (e) {
     }
 
     //retrieve the ticket number
-    var ticketNumber = $(this).closest("tr")[0].cells[0].textContent;
+    var ticket_number = $(this).closest("tr")[0].cells[0].textContent;
 
     var isCompleted = name.toLowerCase() === "completed";
     var isIgnored = name.toLowerCase() === "ignored";
@@ -84,12 +92,12 @@ $("tbody").on("change", ".statusSelect", function (e) {
 
     var returnedData = {};
 
-    if (computerId !== "" && location !== "") {
+    if (computer_id !== "" && location !== "") {
         $.ajax({
             type: "POST", //request type
             url: "functions.php", //the page containing php script
             dataType: 'json',
-            data: { statusId: statusId, ticketNumber: ticketNumber, statusName: name },
+            data: { statusId: statusId, ticket_number: ticket_number, statusName: name },
             success: function (data) {
                 returnedData = data;
             },

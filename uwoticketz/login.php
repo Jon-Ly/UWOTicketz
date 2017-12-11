@@ -31,7 +31,7 @@
 
 <div id="mainContent">
 	<div class="wrapper">
-		<form class="form_default" action="login.php" method="POST">
+		<form class="formDefault" action="login.php" method="POST">
 			<h2 class="form-signin-heading">UWO Ticketz</h2>
 				<!-- PHP -->
 				<?php
@@ -39,7 +39,8 @@
 
 					session_start();
 
-					if(isset($_SESSION["accessLevel"]) && isset($_SESSION["username"])){
+					//sessions are already set, user tried to press back. Redirect.
+					if(isset($_SESSION["access_level"]) && isset($_SESSION["username"])){
 						header('Location: index.php');
 					}
 
@@ -54,7 +55,7 @@
 						if($result["Id"] != null && $result["Password"] == null){
 							$_SESSION["username"] = $user;
 							$result = config("conn")->query("CALL GetUser('$user')")->fetch();
-							$_SESSION["userId"] = $result["Id"];
+							$_SESSION["user_id"] = $result["Id"];
 							header('Location: firstLogin.php');
 						}else{
 							$securedPass = config("conn")->query("CALL GetPassword('$user')");
@@ -65,9 +66,9 @@
 								echo "<p class='redText'>Incorrect Login</p>";
 							}else{
 								$result = config("conn")->query("CALL GetAccessLevelByUser('$user')")->fetch();
-								$_SESSION["accessLevel"] = $result["AccessLevel"];
+								$_SESSION["access_level"] = $result["AccessLevel"];
 								$result = config("conn")->query("CALL GetUser('$user')")->fetch();
-								$_SESSION["userId"] = $result["Id"];
+								$_SESSION["user_id"] = $result["Id"];
 								$_SESSION["username"] = $user;
 								header('Location: index.php');
 							}

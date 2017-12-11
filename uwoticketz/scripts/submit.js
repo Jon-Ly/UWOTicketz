@@ -11,25 +11,29 @@ $(document).ready(function () {
     */
     $("#submit_ticket_button").click(function (e) {
 
-        var computerId = $("#computerId")[0].value;
+        var computer_id = $("#computer_id")[0].value;
         var description = $("#description")[0].value;
+        var successful = false;
 
-        if (computerId != "" && description != "") {
+        if (computer_id != "" && description != "") {
             $.ajax({
                 type: "POST", //request type
                 url: "functions.php", //the page containing php script
                 dataType: 'json',
-                data: { computerId: computerId, description: description },
+                data: { computer_id: computer_id, description: description },
                 success: function (data) {
                     $("#tickets_table > tbody")[0].innerHTML = data[0];
+                    successful = true;
                 },
                 error: function (jqXHR, errorStatus, errorText) {},
                 complete: function () {
-                    $("#computerId")[0].value = "";
-                    $("#description")[0].value = "";
-                    // close the modal
-                    e.preventDefault();
-                    $('#submitTicketModal').modal('toggle');
+                    if (successful) {
+                        $("#computer_id")[0].value = "";
+                        $("#description")[0].value = "";
+                        // close the modal
+                        e.preventDefault();
+                        $('#submitTicketModal').modal('toggle');
+                    }
                 }
             });
         } else {

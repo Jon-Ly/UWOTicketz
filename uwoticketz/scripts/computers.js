@@ -4,7 +4,6 @@ $("document").ready(function () {
 
 //need the previous comp id for updating.
 var old_comp_id;
-var row;
 
 $("tbody").on("click", "button.edit_computer_button", function (e) {
 
@@ -19,9 +18,8 @@ $("tbody").on("click", "button.edit_computer_button", function (e) {
     }
 
     old_comp_id = parseInt(computer_id);
-    row = Object.assign({}, e);
 
-    $("#computerNumberEdit")[0].value = computer_id;
+    $("#computer_numberEdit")[0].value = computer_id;
 
     $("#edit_comp_modal").modal("show");
 
@@ -30,8 +28,9 @@ $("tbody").on("click", "button.edit_computer_button", function (e) {
 
 $("#edit_computer_button").click(function (e) {
 
-    var computer_id = parseInt($("#computerNumberEdit")[0].value);
+    var computer_id = parseInt($("#computer_numberEdit")[0].value);
     var location = parseInt($("#locationsEdit option:selected")[0].value);
+    var successful = false;
 
     if (computer_id !== "" && location !== "" && old_comp_id !== "") {
         $.ajax({
@@ -41,12 +40,15 @@ $("#edit_computer_button").click(function (e) {
             data: { computer_id: computer_id, location: location, previous_computer_id: old_comp_id},
             success: function (data) {
                 $("#computers_table > tbody")[0].innerHTML = data[0];
+                successful = true;
             },
             error: function (jqXHR, errorStatus, errorText) {},
             complete: function () {
                 // close the modal
-                e.preventDefault();
-                $('#edit_comp_modal').modal('toggle');
+                if (successful) {
+                    e.preventDefault();
+                    $('#edit_comp_modal').modal('toggle');
+                }
             }
         });
     } else {
@@ -85,47 +87,49 @@ $("button.remove_computer_button").click(function (e) {
 
 $("#submitComputerButton").click(function (e) {
 
-    var computerId = $("#computerNumberAdd")[0].value;
+    var computer_id = $("#computer_numberAdd")[0].value;
     var location = parseInt($("#locationsAdd option:selected")[0].value);
     var locationLabel = $("#locationsAdd option:selected")[0].label;
+    var successful = false;
 
-    if (computerId !== "" && location !== "") {
+    if (computer_id !== "" && location !== "") {
         $.ajax({
             type: "POST", //request type
             url: "functions.php", //the page containing php script
             dataType: 'json',
-            data: { computerNumber: computerId, location: location },
+            data: { computer_number: computer_id, location: location },
             success: function (data) {
                 var newRow = 
                     "<tr>" +
-                        "<td>" + computerId + "</td>" +
+                        "<td>" + computer_id + "</td>" +
                         "<td>" + locationLabel + "</td>" +
                         "<td>" +
-                            "<form id='edit_computer_form_"+computerId+"' method='POST'>" +
-                                "<input type='text' name='computer_id' value='"+computerId+"' hidden aria-hidden='true'/>" +
-                                "<button class='btn btn-info edit_computer_button' type='submit' id='edit_computer_button_"+computerId+"'>Edit</button>" +
+                            "<form id='edit_computer_form_"+computer_id+"' method='POST'>" +
+                                "<input type='text' name='computer_id' value='"+computer_id+"' hidden aria-hidden='true'/>" +
+                                "<button class='btn btn-info edit_computer_button' type='submit' id='edit_computer_button_"+computer_id+"'>Edit</button>" +
                             "</form >" +
 			            "</td>" +
                         "<td>" +
-                            "<form id='delete_computer_form_"+computerId+"' method='POST'>" +
+                            "<form id='delete_computer_form_"+computer_id+"' method='POST'>" +
                                 "<input type='text' name='computer_id' value='$id' hidden aria-hidden='true'/>" +
-                                "<button class='btn btn-info remove_computer_button' type='submit' id='delete_computer_button_"+computerId+"'>Delete</button>" +
+                                "<button class='btn btn-info remove_computer_button' type='submit' id='delete_computer_button_"+computer_id+"'>Delete</button>" +
                             "</form>" +
 			            "</td>"+
                     "</tr>";
 
                 $("#computers_table > tbody")[0].innerHTML += newRow;
+                successful = true;
             },
-            error: function (jqXHR, errorStatus, errorText) {
-                console.log(jqXHR);
-            },
+            error: function (jqXHR, errorStatus, errorText) {},
             complete: function () {
-                $("#computerNumberAdd")[0].value = "";
-                $("#locationsAdd")[0].value = "";
-                $("#locationsAdd option:selected").prop("selected", false);
-                // close the modal
-                e.preventDefault();
-                $('#addCompModal').modal('toggle');
+                if (successful) {
+                    $("#computer_numberAdd")[0].value = "";
+                    $("#locationsAdd")[0].value = "";
+                    $("#locationsAdd option:selected").prop("selected", false);
+                    // close the modal
+                    e.preventDefault();
+                    $('#addCompModal').modal('toggle');
+                }
             }
         });
     } else {

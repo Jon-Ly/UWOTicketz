@@ -6,7 +6,6 @@
           <th>Computer</th>
           <th>Submitted</th>
 		  <th>Location</th>
-		  <!-- <th>Feedback</th> -->
         </tr>
       </thead>
       <tbody>

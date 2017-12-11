@@ -31,7 +31,7 @@
 
 <div id="mainContent">
 	<div class="wrapper">
-		<form class="form_default" action="firstLogin.php" method="POST">
+		<form class="formDefault" action="firstLogin.php" method="POST">
 			<h2 class="form-signin-heading">UWO Ticketz</h2>
 			<?php 
 			
@@ -39,23 +39,27 @@
 
 			session_start();
 
-			if(isset($_SESSION["accessLevel"]) && isset($_SESSION["username"])){
+			//session is already set, user tried to press back. Redirect.
+			if(isset($_SESSION["access_level"]) && isset($_SESSION["username"])){
 				header('Location: index.php');
 			}
 
 			if(isset($_POST["password"]) && isset($_POST["retype_password"])){
 				
-				$password = config("conn")->quote(password_hash($_POST["password"], PASSWORD_BCRYPT));
+				//salted and hashed password
+				$password = password_hash($_POST["password"], PASSWORD_BCRYPT);
 
-				if($_POST["password"] != $_POST["retype_password"]){
+				//check if the passwords matched
+				if(!password_verify($_POST["retype_password"], $password)){
 					echo "<p class='redText'>Passwords do not match</p>";
-				}else if($_POST["password"] == $_POST["retype_password"]){
+				}else if(password_verify($_POST["retype_password"], $password)){
 					try{
-						if(!config("conn")->query("CALL InsertPassword($password, ".$_SESSION["userId"].")")){
+						$password = config("conn")->quote($password);
+						if(!config("conn")->query("CALL InsertPassword($password, ".$_SESSION["user_id"].")")){
 							throw new Exception("Unable to insert password");
 						}
 						$result = config("conn")->query("CALL GetAccessLevelByUser('$user')")->fetch();
-						$_SESSION["accessLevel"] = $result["AccessLevel"];
+						$_SESSION["access_level"] = $result["AccessLevel"];
 						header('Location: index.php');
 					}catch(Exception $e){
 						echo $e;

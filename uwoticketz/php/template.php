@@ -1,3 +1,6 @@
+<!-- The page template that all pages share except login and firstLogin -->
+
+<!DOCTYPE html>
 <html>
 <head>
 	<meta charset="UTF-8">
@@ -46,7 +49,7 @@
 					<form id="submitTicketForm" method="POST">
 						<div class="form-group">
 							<label>Computer Number</label>
-							<input type="text" class="form-control numeric" id="computerId" name="computerId" placeholder="Computer Number" maxlength="5" required autofocus novalidate/>
+							<input type="text" class="form-control numeric" id="computer_id" name="computer_id" placeholder="Computer Number" maxlength="5" required autofocus novalidate/>
 						</div>
 						<div class="form-group">
 							<label>Description</label>
