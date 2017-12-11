@@ -1,60 +1,67 @@
 $("document").ready(function () {
-    /**
-    * Targets the row clicked and gets the ticket number.
-    */
-    $("button.view_ticket_button").click(function (e) {
-        var ticket_id = ($(this).closest("tr")[0].cells[0].textContent);
+});
 
-        //e.preventDefault();
-        $("#ticketDataModal").modal("show");
+/**
+   * Targets the row clicked and gets the ticket number.
+   */
+$("tbody").on("click", "button.view_ticket_button", function (e) {
+    var ticket_id = ($(this).closest("tr")[0].cells[0].textContent);
 
-        if (ticket_id !== "") {
-            $.ajax({
-                type: "GET", //request type
-                url: "functions.php", //the page containing php script
-                dataType: 'json',
-                data: { ticket_id: ticket_id },
-                success: function (data) {
-                    var ticket_html =
-                        "<div><p class='bold'>Problem Description:</p>" +
-                        "<p>" + data[1]["Description"] + "</p>" +
-                        "</div> <hr> <p class='bold'>Comment Thread:</p> <div id='comment_thread'>";
-                    //The data[0] holds the username for whomever submitted the ticket. The actual comments start at data[1].
-                    $("#ticket_id")[0].innerHTML = ticket_id + " - " + data[0]["Username"];
-                    if (typeof data[1]["Comment"] !== 'undefined') {
-                        for (var x = 1; x < data.length; x++) {
-                            ticket_html +=
-                                "<blockquote class='blockquote marginLeft10px fontSize14px'>" + data[x]["Comment"] +
-                                "<footer class='blockquote-footer'><span class='marginRight10px' >" + data[x]["Username"] + "</span>" +
-                                data[x]["DateSubmitted"] + "</footer></blockquote>";
-                        }
-                    } else {
-                        ticket_html += "<p class='marginLeft10px'>There are currently no comments</p>"
+    //e.preventDefault();
+    $("#ticketDataModal").modal("show");
+
+    if (ticket_id !== "") {
+        $.ajax({
+            type: "GET", //request type
+            url: "functions.php", //the page containing php script
+            dataType: 'json',
+            data: { ticket_id: ticket_id },
+            success: function (data) {
+                var ticket_html =
+                    "<div><p class='bold'>Problem Description:</p>" +
+                    "<p>" + data[1]["Description"] + "</p>" +
+                    "</div> <hr> <p class='bold'>Comment Thread:</p> <div id='comment_thread'>";
+                //The data[0] holds the username for whomever submitted the ticket. The actual comments start at data[1].
+                $("#ticket_id")[0].innerHTML = ticket_id + " - " + data[0]["Username"];
+                if (typeof data[1]["Comment"] !== 'undefined') {
+                    for (var x = 1; x < data.length; x++) {
+                        ticket_html +=
+                            "<blockquote class='blockquote marginLeft10px fontSize14px'>" + data[x]["Comment"] +
+                            "<footer class='blockquote-footer'><span class='marginRight10px' >" + data[x]["Username"] + "</span>" +
+                            data[x]["DateSubmitted"] + "</footer></blockquote>";
                     }
-
-                    ticket_html += "</div>";
-
-                    $(".ticket_information")[0].innerHTML = ticket_html;
-                },
-                error: function (jqXHR, errorStatus, errorText) {
-
-                },
-                complete: function () {
-
+                } else {
+                    ticket_html += "<p class='marginLeft10px'>There are currently no comments</p>"
                 }
-            });
-        } else {
-            return false;
-        }
 
+                ticket_html += "</div>";
+
+                $(".ticket_information")[0].innerHTML = ticket_html;
+
+                if (data[1]["Status"] > 3) {
+                    $("#user_comment").attr("disabled", "disabled");
+                } else {
+                    $("#user_comment").removeAttr("disabled");
+                }
+            },
+            error: function (jqXHR, errorStatus, errorText) {
+
+            },
+            complete: function () {
+
+            }
+        });
+    } else {
         return false;
-    });
+    }
+
+    return false;
 });
 
 /**
 * Update the database with the brand new status.
 */
-$(".statusSelect").change(function (e) {
+$("tbody").on("change", ".statusSelect", function (e) {
 
     var statusId = $(e.currentTarget)[0].value;
     var optionLength = $(e.currentTarget)[0].length;
@@ -68,7 +75,7 @@ $(".statusSelect").change(function (e) {
     }
 
     //retrieve the ticket number
-    var ticketNumber = ($(this).closest("tr")[0].cells[0].textContent);
+    var ticketNumber = $(this).closest("tr")[0].cells[0].textContent;
 
     var isCompleted = name.toLowerCase() === "completed";
     var isIgnored = name.toLowerCase() === "ignored";
@@ -86,9 +93,7 @@ $(".statusSelect").change(function (e) {
             success: function (data) {
                 returnedData = data;
             },
-            error: function (jqXHR, errorStatus, errorText) {
-
-            },
+            error: function (jqXHR, errorStatus, errorText) {},
             complete: function () {
                 if (isCompleted) {
                     //"real-time" update of Completed time on the table.
@@ -140,6 +145,51 @@ $("#submit_comment_button").click(function (e) {
             complete: function () {
                 $("#user_comment")[0].value = "";
             }
+        });
+    } else {
+        return false;
+    }
+
+    return false;
+});
+
+$("button.good_rate_button").click(function (e) {
+
+    var ticket_id = parseInt($(this).closest("tr")[0].cells[0].textContent);
+
+    if (ticket_id !== "") {
+        $.ajax({
+            type: "POST", //request type
+            url: "functions.php", //the page containing php script
+            dataType: 'json',
+            data: { ticket_id: ticket_id, rating: 1 },
+            success: function (data) {
+                $("#tickets_table > tbody")[0].innerHTML = data[0];
+            },
+            error: function (jqXHR, errorStatus, errorText) { console.log(jqXHR); },
+            complete: function () {}
+        });
+    } else {
+        return false;
+    }
+
+    return false;
+});
+
+$("button.bad_rate_button").click(function (e) {
+    var ticket_id = parseInt($(this).closest("tr")[0].cells[0].textContent);
+
+    if (ticket_id !== "") {
+        $.ajax({
+            type: "POST", //request type
+            url: "functions.php", //the page containing php script
+            dataType: 'json',
+            data: { ticket_id: ticket_id, rating: 2 },
+            success: function (data) {
+                $("#tickets_table > tbody")[0].innerHTML = data[0];
+            },
+            error: function (jqXHR, errorStatus, errorText) { },
+            complete: function () { }
         });
     } else {
         return false;

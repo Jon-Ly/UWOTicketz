@@ -34,6 +34,8 @@ $("#submitUserButton").click(function(e) {
                 $("#username")[0].value = "";
                 $("#accessLevel option:selected").prop("selected", false);
                 successful = true;
+
+                $("#users_table > tbody")[0].innerHTML = data[0];
             },
             error: function (jqXHR, errorStatus, errorText) {
                 

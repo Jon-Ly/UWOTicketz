@@ -2,10 +2,14 @@ $("document").ready(function () {
 
 });
 
-$("button.edit_computer_button").click(function (e) {
+//need the previous comp id for updating.
+var old_comp_id;
+var row;
 
-    var computer_id = ($(this).closest("tr")[0].cells[0].textContent);
-    var location = ($(this).closest("tr")[0].cells[1].textContent);
+$("tbody").on("click", "button.edit_computer_button", function (e) {
+
+    var computer_id = $(this).closest("tr")[0].cells[0].textContent;
+    var location = $(this).closest("tr")[0].cells[1].textContent;
     var locations = $("#locationsEdit")[0];
 
     for (var x = 0; x < locations.length; x++) {
@@ -14,9 +18,67 @@ $("button.edit_computer_button").click(function (e) {
         }
     }
 
+    old_comp_id = parseInt(computer_id);
+    row = Object.assign({}, e);
+
     $("#computerNumberEdit")[0].value = computer_id;
 
     $("#edit_comp_modal").modal("show");
+
+    return false;
+});
+
+$("#edit_computer_button").click(function (e) {
+
+    var computer_id = parseInt($("#computerNumberEdit")[0].value);
+    var location = parseInt($("#locationsEdit option:selected")[0].value);
+
+    if (computer_id !== "" && location !== "" && old_comp_id !== "") {
+        $.ajax({
+            type: "POST", //request type
+            url: "functions.php", //the page containing php script
+            dataType: 'json',
+            data: { computer_id: computer_id, location: location, previous_computer_id: old_comp_id},
+            success: function (data) {
+                $("#computers_table > tbody")[0].innerHTML = data[0];
+            },
+            error: function (jqXHR, errorStatus, errorText) {},
+            complete: function () {
+                // close the modal
+                e.preventDefault();
+                $('#edit_comp_modal').modal('toggle');
+            }
+        });
+    } else {
+        return false;
+    }
+
+    return false;
+});
+
+$("button.remove_computer_button").click(function (e) {
+
+    var computer_id = $(this).closest("tr")[0].cells[0].textContent;
+
+    if (computer_id !== "") {
+        $.ajax({
+            type: "POST", //request type
+            url: "functions.php", //the page containing php script
+            dataType: 'json',
+            data: { computer_id: computer_id },
+            success: function (data) {
+                $("#computers_table > tbody")[0].innerHTML = data[0];
+            },
+            error: function (jqXHR, errorStatus, errorText) {
+                alert("Unable to delete that computer due to a ticket still open for that computer.");
+            },
+            complete: function () {
+
+            }
+        });
+    } else {
+        return false;
+    }
 
     return false;
 });

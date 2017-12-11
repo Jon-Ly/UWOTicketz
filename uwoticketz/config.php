@@ -39,6 +39,7 @@ function config($key = '')
 			'' => '',
 			'userTickets' => 'Personal Tickets',
             'submit' => 'Submit Ticket',
+			'report' => 'Report',
 			'logout' => 'Logout'
 		],
 		'user_nav_menu' =>[

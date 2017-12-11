@@ -3,7 +3,7 @@
 	if(isAdmin()){?>
 		<button type="button" class="btn btn-info btn-lg marginTop10px" data-toggle="modal" data-target="#addUserModal">Add User</button>
 	<?php } ?>
-	<table class="table table-striped">
+	<table class="table table-striped" id="users_table">
 		<thead>
 			<tr>
 				<th>First Name</th>
@@ -33,7 +33,7 @@
 			  <form id="addUserForm" method="POST">
 				<div class="form-group">
 					<label>First Name</label>
-					<input class="form-control letters" id="firstName" name="firstName" type="text" maxlength="25" autofocus required novalidate />
+					<input class="form-control letter" id="firstName" name="firstName" type="text" maxlength="25" autofocus required novalidate />
 				</div>
 				<div class="form-group">
 					<label>Last Name</label>
