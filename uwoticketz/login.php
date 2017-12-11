@@ -21,7 +21,6 @@
 		crossorigin="anonymous">
 	</script>
 	<script src="scripts/index.js"></script>
-	<script src="scripts/login.js"></script>
 </head>
 <body>
 
