@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 11, 2017 at 07:09 AM
+-- Generation Time: Dec 11, 2017 at 07:39 AM
 -- Server version: 10.1.26-MariaDB
 -- PHP Version: 7.1.9
 
@@ -26,13 +26,13 @@ DELIMITER $$
 --
 -- Procedures
 --
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `DeleteComputer` (IN `computerId` INT)  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteComputer` (IN `computerId` INT)  NO SQL
 DELETE FROM
 	computer
 WHERE
 	Id = computerId$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAccessLevelByUser` (IN `uname` VARCHAR(100))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAccessLevelByUser` (IN `uname` VARCHAR(100))  NO SQL
 SELECT
 	AccessLevel
 FROM
@@ -41,14 +41,14 @@ FROM
 WHERE
 	Username = uname$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllAccessLevels` ()  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllAccessLevels` ()  NO SQL
 SELECT
 	Id,
     AccessLevel
 FROM 
 	accesslevel$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllComputers` ()  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllComputers` ()  NO SQL
 SELECT
 	computer.Id,
     LocationName,
@@ -60,7 +60,7 @@ ORDER BY
 	computer.Id
 ASC$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllLocations` ()  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllLocations` ()  NO SQL
 SELECT
 	Id,
     LocationName
@@ -70,14 +70,14 @@ ORDER BY
 	LocationName
 ASC$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllStatuses` ()  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllStatuses` ()  NO SQL
 SELECT
 	Id,
     StatusName
 FROM
 	ticketstatus$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllTickets` ()  READS SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllTickets` ()  READS SQL DATA
 SELECT
 	Ticket.Id, 
     ComputerId, 
@@ -93,7 +93,7 @@ ORDER BY
 	DateSubmitted
 DESC$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllUsers` ()  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllUsers` ()  NO SQL
 SELECT
 	FirstName,
     LastName,
@@ -102,7 +102,7 @@ SELECT
 FROM User
 INNER JOIN accesslevel ON AccessLevelId = accesslevel.Id$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetComputerById` (IN `computerId` INT(11) UNSIGNED)  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetComputerById` (IN `computerId` INT(11) UNSIGNED)  NO SQL
 SELECT
 	Id,
     LocationId
@@ -111,7 +111,7 @@ FROM
 WHERE
 	Id = computerId$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetPassword` (IN `uname` VARCHAR(10))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetPassword` (IN `uname` VARCHAR(10))  NO SQL
 SELECT
 	Password
 FROM
@@ -119,7 +119,7 @@ FROM
 WHERE
 	Username = uname$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetStatusById` (IN `statusId` INT(11))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStatusById` (IN `statusId` INT(11))  NO SQL
 SELECT
 	Id,
     StatusName
@@ -128,7 +128,7 @@ FROM
 WHERE
 	Id = statusId$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetTicketInformationById` (IN `ticketId` INT)  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTicketInformationById` (IN `ticketId` INT)  NO SQL
 IF EXISTS(
 	SELECT
         Description,
@@ -166,7 +166,7 @@ ELSE
         ticket.Id = ticketId;
 END IF$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetTicketsByUserId` (IN `userId` INT(11))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTicketsByUserId` (IN `userId` INT(11))  NO SQL
 SELECT
 	ticket.Id AS TicketId,
     ComputerId,
@@ -188,7 +188,7 @@ WHERE
 ORDER BY
 	ticket.Id ASC$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetTimeStampForTicket` (IN `ticketNumber` INT(11))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTimeStampForTicket` (IN `ticketNumber` INT(11))  NO SQL
 SELECT
 	DateCompleted
 FROM
@@ -196,7 +196,7 @@ FROM
 WHERE
 	Id = ticketNumber$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetUser` (IN `uname` VARCHAR(100))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUser` (IN `uname` VARCHAR(100))  NO SQL
 SELECT
 	Id,
     Password
@@ -205,7 +205,7 @@ FROM
 WHERE
 	Username = uname$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetUserByTicket` (IN `ticketId` INT)  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserByTicket` (IN `ticketId` INT)  NO SQL
 SELECT
 	Username
 FROM
@@ -214,7 +214,7 @@ FROM
 WHERE
 	ticket.Id = ticketId$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetUsernameById` (IN `userId` INT(11))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUsernameById` (IN `userId` INT(11))  NO SQL
 SELECT
 	user.Username
 FROM
@@ -222,19 +222,19 @@ FROM
 WHERE
 	user.Id = userId$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertComment` (IN `userId` INT(11), IN `ticketId` INT(11), IN `comment` TEXT)  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertComment` (IN `userId` INT(11), IN `ticketId` INT(11), IN `comment` TEXT)  NO SQL
 INSERT INTO comments
 (UserId, TicketNumber, Comment, DateSubmitted)
 VALUES
 (userId, ticketId, comment, CURRENT_TIMESTAMP)$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertComputer` (IN `computerId` INT(11), IN `location` INT(11))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertComputer` (IN `computerId` INT(11), IN `location` INT(11))  NO SQL
 INSERT INTO computer
 (Id, LocationId)
 VALUES
 (computerId, location)$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertPassword` (IN `pword` VARCHAR(100), IN `userId` INT)  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertPassword` (IN `pword` VARCHAR(100), IN `userId` INT)  NO SQL
 UPDATE
 	user
 SET
@@ -242,7 +242,7 @@ SET
 WHERE
 	Id = userId$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertRating` (IN `ticketId` INT, IN `ratingId` INT)  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertRating` (IN `ticketId` INT, IN `ratingId` INT)  NO SQL
 UPDATE
 	ticket
 SET
@@ -250,7 +250,7 @@ SET
 WHERE
 	ticket.Id = ticketId$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertTicket` (IN `computerId` INT(11) UNSIGNED, IN `description` VARCHAR(500), IN `userId` INT(11) UNSIGNED)  MODIFIES SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertTicket` (IN `computerId` INT(11) UNSIGNED, IN `description` VARCHAR(500), IN `userId` INT(11) UNSIGNED)  MODIFIES SQL DATA
 IF NOT EXISTS(
 	SELECT
     	*
@@ -269,13 +269,13 @@ VALUES
 	(computerId, userId, CURRENT_TIMESTAMP, description, 1);
 END IF$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertUser` (IN `firstName` VARCHAR(25), IN `lastName` VARCHAR(25), IN `username` VARCHAR(10), IN `accessLevel` INT(11))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertUser` (IN `firstName` VARCHAR(25), IN `lastName` VARCHAR(25), IN `username` VARCHAR(10), IN `accessLevel` INT(11))  NO SQL
 INSERT INTO user
 (FirstName, LastName, Username, AccessLevelId, Archived)
 VALUES
 (firstName, lastName, username, accessLevel, 0)$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `UpdateComputer` (IN `newId` INT, IN `location` INT, IN `oldId` INT)  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateComputer` (IN `newId` INT, IN `location` INT, IN `oldId` INT)  NO SQL
 BEGIN
 	INSERT INTO computer (Id, LocationId)
     VALUES(newId, location);
@@ -292,7 +292,7 @@ BEGIN
         Id = oldId;
 END$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `UpdateTicketStatus` (IN `ticketNumber` INT, IN `statusId` INT, IN `name` VARCHAR(25), IN `userId` INT)  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateTicketStatus` (IN `ticketNumber` INT, IN `statusId` INT, IN `name` VARCHAR(25), IN `userId` INT)  NO SQL
 IF name = 'Completed' THEN
     UPDATE ticket SET
         Status = statusId,

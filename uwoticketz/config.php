@@ -14,7 +14,7 @@ function config($key = '')
 	//Server config
 	$host = "localhost";
 	$db = "lyj47";
-	$username = "lyj47";
+	$username = "root";
 	$password = "";
 	$charset = 'utf8mb4';
 
