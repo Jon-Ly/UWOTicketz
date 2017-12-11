@@ -53,10 +53,8 @@ $("tbody").on("click", "button.view_ticket_button", function (e) {
 
             },
             complete: function () {
-                if (successful) {
-                    e.preventDefault();
-                    $('#ticketDataModal').modal('toggle');
-                }
+                e.preventDefault();
+                $('#ticketDataModal').modal('toggle');
             }
         });
     } else {

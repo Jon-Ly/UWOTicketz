@@ -30,7 +30,6 @@ $("#edit_computer_button").click(function (e) {
 
     var computer_id = parseInt($("#computer_numberEdit")[0].value);
     var location = parseInt($("#locationsEdit option:selected")[0].value);
-    var successful = false;
 
     if (computer_id !== "" && location !== "" && old_comp_id !== "") {
         $.ajax({
@@ -40,15 +39,12 @@ $("#edit_computer_button").click(function (e) {
             data: { computer_id: computer_id, location: location, previous_computer_id: old_comp_id},
             success: function (data) {
                 $("#computers_table > tbody")[0].innerHTML = data[0];
-                successful = true;
             },
             error: function (jqXHR, errorStatus, errorText) {},
             complete: function () {
                 // close the modal
-                if (successful) {
-                    e.preventDefault();
-                    $('#edit_comp_modal').modal('toggle');
-                }
+                e.preventDefault();
+                $('#edit_comp_modal').modal('toggle');
             }
         });
     } else {
@@ -122,14 +118,12 @@ $("#submitComputerButton").click(function (e) {
             },
             error: function (jqXHR, errorStatus, errorText) {},
             complete: function () {
-                if (successful) {
-                    $("#computer_numberAdd")[0].value = "";
-                    $("#locationsAdd")[0].value = "";
-                    $("#locationsAdd option:selected").prop("selected", false);
-                    // close the modal
-                    e.preventDefault();
-                    $('#addCompModal').modal('toggle');
-                }
+                $("#computer_numberAdd")[0].value = "";
+                $("#locationsAdd")[0].value = "";
+                $("#locationsAdd option:selected").prop("selected", false);
+                // close the modal
+                e.preventDefault();
+                $('#addCompModal').modal('toggle');
             }
         });
     } else {

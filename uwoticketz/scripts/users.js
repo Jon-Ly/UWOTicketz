@@ -15,8 +15,6 @@ $("#submitUserButton").click(function(e) {
 
     var validNames = (/^[a-zA-Z]+$/.test(first_name) && /^[a-zA-Z]+$/.test(last_name));
 
-    var successful = false;
-
     if (first_name !== "" && last_name !== "" && username !== "" && access_level >= 0 && validNames) {
         $.ajax({
             type: "POST", //request type
@@ -42,10 +40,8 @@ $("#submitUserButton").click(function(e) {
             },
             complete: function () {
                 // close the modal
-                if (successful) {
-                    e.preventDefault();
-                    $('#addUserModal').modal('toggle');
-                }
+                e.preventDefault();
+                $('#addUserModal').modal('toggle');
             }
         });
     } else {

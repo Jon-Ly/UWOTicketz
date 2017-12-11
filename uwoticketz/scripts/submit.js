@@ -25,15 +25,13 @@ $(document).ready(function () {
                     $("#tickets_table > tbody")[0].innerHTML = data[0];
                     successful = true;
                 },
-                error: function (jqXHR, errorStatus, errorText) {},
+                error: function (jqXHR, errorStatus, errorText) {console.log(jqXHR)},
                 complete: function () {
-                    if (successful) {
-                        $("#computer_id")[0].value = "";
-                        $("#description")[0].value = "";
-                        // close the modal
-                        e.preventDefault();
-                        $('#submitTicketModal').modal('toggle');
-                    }
+                    $("#computer_id")[0].value = "";
+                    $("#description")[0].value = "";
+                    // close the modal
+                    e.preventDefault();
+                    $('#submitTicketModal').modal('toggle');
                 }
             });
         } else {
