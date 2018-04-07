@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 14, 2017 at 04:08 AM
+-- Generation Time: Dec 11, 2017 at 07:39 AM
 -- Server version: 10.1.26-MariaDB
 -- PHP Version: 7.1.9
 
@@ -26,17 +26,33 @@ DELIMITER $$
 --
 -- Procedures
 --
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllAccessLevels` ()  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteComputer` (IN `computerId` INT)  NO SQL
+DELETE FROM
+	computer
+WHERE
+	Id = computerId$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAccessLevelByUser` (IN `uname` VARCHAR(100))  NO SQL
+SELECT
+	AccessLevel
+FROM
+	user
+    INNER JOIN accesslevel ON AccessLevelId = accesslevel.Id
+WHERE
+	Username = uname$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllAccessLevels` ()  NO SQL
 SELECT
 	Id,
     AccessLevel
 FROM 
 	accesslevel$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllComputers` ()  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllComputers` ()  NO SQL
 SELECT
 	computer.Id,
-    LocationName
+    LocationName,
+    location.Id AS LocationId
 FROM
 	computer
     INNER JOIN location ON computer.LocationId = location.Id
@@ -44,7 +60,7 @@ ORDER BY
 	computer.Id
 ASC$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllLocations` ()  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllLocations` ()  NO SQL
 SELECT
 	Id,
     LocationName
@@ -54,19 +70,22 @@ ORDER BY
 	LocationName
 ASC$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllLogs` ()  NO SQL
-SELECT * FROM Log$$
-
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllStatuses` ()  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllStatuses` ()  NO SQL
 SELECT
 	Id,
     StatusName
 FROM
 	ticketstatus$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllTickets` ()  READS SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllTickets` ()  READS SQL DATA
 SELECT
-Ticket.Id, ComputerId, DateSubmitted, DateCompleted, StatusName, Rating
+	Ticket.Id, 
+    ComputerId, 
+    DateSubmitted, 
+    DateCompleted, 
+    StatusName, 
+    Rating,
+    UserAssignedId
 FROM 
 	Ticket 
     INNER JOIN ticketstatus ON ticketstatus.Id = Ticket.Status
@@ -74,7 +93,7 @@ ORDER BY
 	DateSubmitted
 DESC$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetAllUsers` ()  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllUsers` ()  NO SQL
 SELECT
 	FirstName,
     LastName,
@@ -83,7 +102,7 @@ SELECT
 FROM User
 INNER JOIN accesslevel ON AccessLevelId = accesslevel.Id$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetComputerById` (IN `computerId` INT(11) UNSIGNED)  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetComputerById` (IN `computerId` INT(11) UNSIGNED)  NO SQL
 SELECT
 	Id,
     LocationId
@@ -92,7 +111,15 @@ FROM
 WHERE
 	Id = computerId$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetStatusById` (IN `statusId` INT(11))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetPassword` (IN `uname` VARCHAR(10))  NO SQL
+SELECT
+	Password
+FROM
+	user
+WHERE
+	Username = uname$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetStatusById` (IN `statusId` INT(11))  NO SQL
 SELECT
 	Id,
     StatusName
@@ -101,10 +128,49 @@ FROM
 WHERE
 	Id = statusId$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetTicketsByUserId` (IN `userId` INT(11))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTicketInformationById` (IN `ticketId` INT)  NO SQL
+IF EXISTS(
+	SELECT
+        Description,
+        Comment,
+        Username,
+        comments.DateSubmitted,
+    	Status
+    FROM
+        ticket
+        INNER JOIN comments ON ticket.Id = comments.TicketNumber
+        INNER JOIN user ON comments.UserId = user.Id
+    WHERE
+        ticket.Id = ticketId
+    ) THEN
+   SELECT
+        Description,
+        Comment,
+        Username,
+        comments.DateSubmitted
+    FROM
+        ticket
+        INNER JOIN comments ON ticket.Id = comments.TicketNumber
+        INNER JOIN user ON comments.UserId = user.Id
+    WHERE
+        ticket.Id = ticketId;
+ELSE
+   SELECT
+        Description,
+        Username,
+        Status
+    FROM
+        ticket
+        INNER JOIN user ON ticket.UserId = user.Id
+    WHERE
+        ticket.Id = ticketId;
+END IF$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTicketsByUserId` (IN `userId` INT(11))  NO SQL
 SELECT
-	ticket.Id,
+	ticket.Id AS TicketId,
     ComputerId,
+    LocationName,
     DateSubmitted,
     DateCompleted,
     Status,
@@ -113,11 +179,16 @@ SELECT
     Comments,
     UserId
 FROM
-	ticket INNER JOIN user ON UserId = user.Id
+	ticket 
+    INNER JOIN user ON ticket.UserId = user.Id
+    INNER JOIN computer ON ComputerId = computer.Id
+    INNER JOIN location ON LocationId = location.Id
 WHERE
-	UserId = userId$$
+	user.Id = userId
+ORDER BY
+	ticket.Id ASC$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `GetTimeStampForTicket` (IN `ticketNumber` INT(11))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTimeStampForTicket` (IN `ticketNumber` INT(11))  NO SQL
 SELECT
 	DateCompleted
 FROM
@@ -125,30 +196,121 @@ FROM
 WHERE
 	Id = ticketNumber$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertComputer` (IN `computerId` INT(11), IN `location` INT(11))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUser` (IN `uname` VARCHAR(100))  NO SQL
+SELECT
+	Id,
+    Password
+FROM
+	user
+WHERE
+	Username = uname$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserByTicket` (IN `ticketId` INT)  NO SQL
+SELECT
+	Username
+FROM
+	ticket
+    INNER JOIN user ON ticket.UserId = user.Id
+WHERE
+	ticket.Id = ticketId$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUsernameById` (IN `userId` INT(11))  NO SQL
+SELECT
+	user.Username
+FROM
+	user
+WHERE
+	user.Id = userId$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertComment` (IN `userId` INT(11), IN `ticketId` INT(11), IN `comment` TEXT)  NO SQL
+INSERT INTO comments
+(UserId, TicketNumber, Comment, DateSubmitted)
+VALUES
+(userId, ticketId, comment, CURRENT_TIMESTAMP)$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertComputer` (IN `computerId` INT(11), IN `location` INT(11))  NO SQL
 INSERT INTO computer
 (Id, LocationId)
 VALUES
 (computerId, location)$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertTicket` (IN `computerId` INT(11) UNSIGNED, IN `description` VARCHAR(500), IN `userId` INT(11) UNSIGNED)  MODIFIES SQL DATA
-INSERT INTO
-ticket(ComputerId, UserId, DateSubmitted, Description, Status)
-VALUES(computerId, userId, CURRENT_TIMESTAMP, description, 1)$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertPassword` (IN `pword` VARCHAR(100), IN `userId` INT)  NO SQL
+UPDATE
+	user
+SET
+	Password = pword
+WHERE
+	Id = userId$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `InsertUser` (IN `firstName` VARCHAR(25), IN `lastName` VARCHAR(25), IN `username` VARCHAR(10), IN `accessLevel` INT(11))  NO SQL
-INSERT INTO user
-(FirstName, LastName, Username, AccessLevelId, Password, Archived)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertRating` (IN `ticketId` INT, IN `ratingId` INT)  NO SQL
+UPDATE
+	ticket
+SET
+	Rating = ratingId
+WHERE
+	ticket.Id = ticketId$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertTicket` (IN `computerId` INT(11) UNSIGNED, IN `description` VARCHAR(500), IN `userId` INT(11) UNSIGNED)  MODIFIES SQL DATA
+IF NOT EXISTS(
+	SELECT
+    	*
+    FROM
+    	ticket
+    WHERE
+    	ticket.ComputerId = computerId
+    	AND
+    	ticket.UserId = userId
+    	AND
+    	(ticket.Status <> 3 OR ticket.Status <> 4)
+) THEN
+INSERT INTO ticket
+	(ComputerId, UserId, DateSubmitted, Description, Status)
 VALUES
-(firstName, lastName, username, accessLevel, 'password', 0)$$
+	(computerId, userId, CURRENT_TIMESTAMP, description, 1);
+END IF$$
 
-CREATE DEFINER=`lyj47`@`localhost` PROCEDURE `UpdateTicketStatus` (IN `ticketNumber` INT(11), IN `statusId` INT(11), IN `name` VARCHAR(25))  NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertUser` (IN `firstName` VARCHAR(25), IN `lastName` VARCHAR(25), IN `username` VARCHAR(10), IN `accessLevel` INT(11))  NO SQL
+INSERT INTO user
+(FirstName, LastName, Username, AccessLevelId, Archived)
+VALUES
+(firstName, lastName, username, accessLevel, 0)$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateComputer` (IN `newId` INT, IN `location` INT, IN `oldId` INT)  NO SQL
+BEGIN
+	INSERT INTO computer (Id, LocationId)
+    VALUES(newId, location);
+    
+	UPDATE
+    	ticket
+    SET
+    	ticket.ComputerId = newId
+    WHERE
+    	ticket.ComputerId = oldId;
+    DELETE FROM
+        computer
+    WHERE
+        Id = oldId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateTicketStatus` (IN `ticketNumber` INT, IN `statusId` INT, IN `name` VARCHAR(25), IN `userId` INT)  NO SQL
 IF name = 'Completed' THEN
     UPDATE ticket SET
         Status = statusId,
         DateCompleted = CURRENT_TIMESTAMP
     WHERE
-        iD = ticketNumber;
+        Id = ticketNumber;
+ELSEIF name = 'In Progress' THEN
+	UPDATE ticket SET
+        Status = statusId,
+       	UserAssignedId = userId
+    WHERE
+        Id = ticketNumber;
+ELSEIF name = 'Open' THEN
+	UPDATE ticket SET
+        Status = statusId,
+       	UserAssignedId = NULL
+    WHERE
+        Id = ticketNumber;
 ELSE
 	UPDATE ticket SET
         Status = statusId
@@ -186,6 +348,7 @@ INSERT INTO `accesslevel` (`Id`, `AccessLevel`) VALUES
 
 CREATE TABLE `comments` (
   `Id` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
   `TicketNumber` int(11) NOT NULL,
   `Comment` text NOT NULL,
   `DateSubmitted` datetime NOT NULL
@@ -207,18 +370,22 @@ CREATE TABLE `computer` (
 --
 
 INSERT INTO `computer` (`Id`, `LocationId`) VALUES
-(100, 4),
-(101, 4),
-(102, 4),
-(103, 4),
-(104, 4),
-(105, 4),
-(106, 4),
-(107, 4),
-(108, 4),
-(109, 4),
-(110, 4),
-(111, 4);
+(111, 4),
+(112, 4),
+(1001, 4),
+(1015, 4),
+(1022, 4),
+(1033, 4),
+(1077, 4),
+(1088, 4),
+(1099, 4),
+(114, 7),
+(117, 7),
+(118, 8),
+(116, 11),
+(110, 12),
+(115, 14),
+(113, 18);
 
 -- --------------------------------------------------------
 
@@ -257,19 +424,6 @@ INSERT INTO `location` (`Id`, `LocationName`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `log`
---
-
-CREATE TABLE `log` (
-  `Id` int(11) NOT NULL,
-  `LogText` text NOT NULL,
-  `Date` date NOT NULL,
-  `UserId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `ticket`
 --
 
@@ -279,10 +433,11 @@ CREATE TABLE `ticket` (
   `UserId` int(11) NOT NULL,
   `DateSubmitted` datetime NOT NULL,
   `Comments` text,
-  `Rating` bit(1) DEFAULT NULL,
+  `Rating` smallint(2) DEFAULT NULL,
   `DateCompleted` datetime DEFAULT NULL,
   `Description` varchar(500) NOT NULL,
-  `Status` int(11) NOT NULL
+  `Status` int(11) NOT NULL,
+  `UserAssignedId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -317,9 +472,9 @@ CREATE TABLE `user` (
   `FirstName` varchar(25) NOT NULL,
   `LastName` varchar(25) NOT NULL,
   `AccessLevelId` int(11) NOT NULL,
-  `Password` varchar(100) NOT NULL,
+  `Password` char(60) DEFAULT NULL,
   `Username` varchar(10) NOT NULL,
-  `Archived` bit(1) NOT NULL
+  `Archived` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -327,11 +482,9 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`Id`, `FirstName`, `LastName`, `AccessLevelId`, `Password`, `Username`, `Archived`) VALUES
-(1, 'Joe', 'Joe', 1, 'password', 'password', b'1111111111111111111111111111111'),
-(2, 'a', 'a', 0, 'password', 'a', b'1111111111111111111111111111111'),
-(3, 'dad', 'dad', 0, 'password', 'dad', b'1111111111111111111111111111111'),
-(4, 'mom', 'mom', 0, 'password', 'mom', b'1111111111111111111111111111111'),
-(5, 'dwad', 'dwad', 1, 'password', 'dwad', b'1111111111111111111111111111111');
+(11, 'Admin', 'Admin', 1, '$2y$10$nrObYbZser5/5DWwuYaZBO1M/29my2MFJoQuhSXy9HHDde7pPFXle', 'Admin', 0),
+(14, 'Auditor', 'Auditor', 2, '$2y$10$oue6gqqXh.YMcnVWLxFXxuOGyiupPA8kwCGUeL5Nt2fXDYz29RDqO', 'Auditor', 0),
+(15, 'User', 'User', 0, '$2y$10$wcojZntBdu268rVAH6dHJOB5NFVMPbVwrkrgbPoywcW7GrfPWphse', 'User', 0);
 
 --
 -- Indexes for dumped tables
@@ -365,13 +518,6 @@ ALTER TABLE `location`
   ADD PRIMARY KEY (`Id`);
 
 --
--- Indexes for table `log`
---
-ALTER TABLE `log`
-  ADD PRIMARY KEY (`Id`),
-  ADD KEY `UserId` (`UserId`);
-
---
 -- Indexes for table `ticket`
 --
 ALTER TABLE `ticket`
@@ -402,7 +548,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `location`
@@ -411,22 +557,16 @@ ALTER TABLE `location`
   MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
--- AUTO_INCREMENT for table `log`
---
-ALTER TABLE `log`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `ticket`
 --
 ALTER TABLE `ticket`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Constraints for dumped tables
@@ -443,12 +583,6 @@ ALTER TABLE `comments`
 --
 ALTER TABLE `computer`
   ADD CONSTRAINT `Computer_ibfk_1` FOREIGN KEY (`LocationId`) REFERENCES `location` (`Id`);
-
---
--- Constraints for table `log`
---
-ALTER TABLE `log`
-  ADD CONSTRAINT `Log_ibfk_1` FOREIGN KEY (`UserId`) REFERENCES `user` (`Id`);
 
 --
 -- Constraints for table `ticket`

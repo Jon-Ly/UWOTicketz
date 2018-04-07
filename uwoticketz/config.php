@@ -14,7 +14,7 @@ function config($key = '')
 	//Server config
 	$host = "http://softeng.cs.uwosh.edu";
 	$db = "lyj47";
-	$username = "lyj47";
+	$username = "root";
 	$password = "";
 	$charset = 'utf8mb4';
 
@@ -27,20 +27,19 @@ function config($key = '')
 	//View config
     $config = [
         'name' => 'UWO Ticketz',
-        'nav_menu' => [ //default is IT.
+        'it_nav_menu' => [
             '' => '',
             'computers' => 'Computers',
             'users' => 'Users',
-			'userTickets' => 'Past Tickets',
+			'userTickets' => 'Personal Tickets',
             'submit' => 'Submit Ticket',
 			'logout' => 'Logout'
         ],
 		'auditor_nav_menu' => [
 			'' => '',
-			'computers' => 'Computers',
-            'users' => 'Users',
-			'userTickets' => 'Past Tickets',
+			'userTickets' => 'Personal Tickets',
             'submit' => 'Submit Ticket',
+			'report' => 'Report',
 			'logout' => 'Logout'
 		],
 		'user_nav_menu' =>[

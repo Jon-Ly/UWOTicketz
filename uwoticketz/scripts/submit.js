@@ -9,28 +9,25 @@ $(document).ready(function () {
     * In the case you want error, just echo nothing.
     * As of now, unsure if you can do double ajax calls for php.
     */
-    $("#submitTicketButton").click(function (e) {
+    $("#submit_ticket_button").click(function (e) {
 
-        var computerId = $("#computerId")[0].value;
+        var computer_id = $("#computer_id")[0].value;
         var description = $("#description")[0].value;
 
-        if (computerId != "" && description != "") {
+        if (computer_id != "" && description != "") {
             $.ajax({
                 type: "POST", //request type
                 url: "functions.php", //the page containing php script
                 dataType: 'json',
-                data: { computerId: computerId, description: description },
+                data: { computer_id: computer_id, description: description },
                 success: function (data) {
-                    $("#computerId")[0].value = "";
-                    $("#description")[0].value = "";
-                    $("#successMessage").removeClass("noDisplay");
-                    $("#errorMessage").addClass("noDisplay");
+                    if(typeof $("#tickets_table > tbody")[0] !== "undefined")
+                        $("#tickets_table > tbody")[0].innerHTML = data[0];
                 },
-                error: function (jqXHR, errorStatus, errorText) {
-                    $("#errorMessage").removeClass("noDisplay");
-                    $("#successMessage").addClass("noDisplay");
-                },
+                error: function (jqXHR, errorStatus, errorText) {console.log(jqXHR)},
                 complete: function () {
+                    $("#computer_id")[0].value = "";
+                    $("#description")[0].value = "";
                     // close the modal
                     e.preventDefault();
                     $('#submitTicketModal').modal('toggle');

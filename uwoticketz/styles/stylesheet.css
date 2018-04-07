@@ -1,6 +1,16 @@
 /*element tags*/
 body {background: #eee !important;}
 
+fieldset{border: 1px solid black;}
+
+/*button{width: 100px;}*/
+
+legend{
+    width: inherit;
+    padding: 0 10px;
+    border-bottom: none;
+}
+
 /*Classes*/
 .wrapper {	
 	margin-top: 80px;
@@ -35,6 +45,13 @@ body {background: #eee !important;}
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+/*Font Sizes*/
+.fontSize12px{font-size: 12px}
+.fontSize14px{font-size: 14px;}
+.fontSize16px{font-size: 16px;}
+.fontSize18px{font-size: 18px;}
+.fontSize24px{font-size: 24px;}
 
 /*Colors*/
 .redText {color: #ff0000;}

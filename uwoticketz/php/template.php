@@ -1,3 +1,6 @@
+<!-- The page template that all pages share except login and firstLogin -->
+
+<!DOCTYPE html>
 <html>
 <head>
 	<meta charset="UTF-8">
@@ -46,13 +49,13 @@
 					<form id="submitTicketForm" method="POST">
 						<div class="form-group">
 							<label>Computer Number</label>
-							<input type="text" class="form-control numeric" id="computerId" name="computerId" placeholder="Computer Number" maxlength="5" required autofocus novalidate/>
+							<input type="text" class="form-control numeric" id="computer_id" name="computer_id" placeholder="Computer Number" maxlength="5" required autofocus novalidate/>
 						</div>
 						<div class="form-group">
 							<label>Description</label>
-							<textarea class="form-control" id="description" rows="12" name="description" placeholder="Issue Description" required novalidate></textarea>    
+							<textarea class="form-control" id="description" rows="12" name="description" placeholder="Issue Description" maxlength="600" required novalidate></textarea>    
 						</div>
-						<button class="btn btn-success floatRight" type="submit" id="submitTicketButton">Submit</button>
+						<button class="btn btn-success floatRight" type="submit" id="submit_ticket_button">Submit</button>
 						<button type="button" class="btn btn-default floatRight marginRight10px" data-dismiss="modal">Cancel</button>
 					</form>
 				</div>

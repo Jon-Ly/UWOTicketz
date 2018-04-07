@@ -1,14 +1,17 @@
 <div class="container">
-  <button type="button" class="btn btn-info btn-lg marginTop10px" data-toggle="modal" data-target="#addUserModal">Add User</button>
-	<table class="table table-striped">
-      <thead>
-        <tr>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Username</th>
-		  <th>Access</th>
-        </tr>
-      </thead>
+	<?php
+	if(isAdmin()){?>
+		<button type="button" class="btn btn-info btn-lg marginTop10px" data-toggle="modal" data-target="#addUserModal">Add User</button>
+	<?php } ?>
+	<table class="table table-striped" id="users_table">
+		<thead>
+			<tr>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Username</th>
+				<th>Access</th>
+			</tr>
+		</thead>
       <tbody>
 		<?php userTable(); ?>
       </tbody>
@@ -30,11 +33,11 @@
 			  <form id="addUserForm" method="POST">
 				<div class="form-group">
 					<label>First Name</label>
-					<input class="form-control letters" id="firstName" name="firstName" type="text" maxlength="25" autofocus required novalidate />
+					<input class="form-control letter" id="first_name" name="first_name" type="text" maxlength="25" autofocus required novalidate />
 				</div>
 				<div class="form-group">
 					<label>Last Name</label>
-					<input class="form-control letters" id="lastName" name="lastName" type="text" maxlength="25" required novalidate />
+					<input class="form-control letters" id="last_name" name="last_name" type="text" maxlength="25" required novalidate />
 				</div>
 				<div class="form-group">
 					<label>Username</label>
@@ -42,7 +45,7 @@
 				</div>
 				<div class="form-group">
 					<label>Access Level</label>
-					<select class="form-control" id="accessLevel">
+					<select class="form-control" id="access_level">
 						<?php accessLevelList() ?>
 					</select>
 				</div>
