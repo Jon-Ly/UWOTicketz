@@ -44,6 +44,7 @@ function isAuditor(){
 function navMenu(){
 	$navMenu = '';
 
+
 	if(strtolower($_SESSION["access_level"]) == "it"){
 		foreach (config('it_nav_menu') as $uri => $name) {
 			if($uri != "submit")
@@ -51,6 +52,7 @@ function navMenu(){
 			else
 				$navMenu .= "<li class='nav-item'><a class='nav-link bold' data-toggle='modal' data-target='#submitTicketModal' href='#'>".$name."</li></a>";
 		}
+
 	}else if(strtolower($_SESSION["access_level"]) == "user"){
 		foreach (config('user_nav_menu') as $uri => $name) {
 			if($uri != "submit")

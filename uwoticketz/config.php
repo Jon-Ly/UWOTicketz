@@ -12,7 +12,7 @@ function config($key = '')
 	//Password is s0688747 (wooo look a password, super secure)
 	
 	//Server config
-	$host = "localhost";
+	$host = "http://softeng.cs.uwosh.edu";
 	$db = "lyj47";
 	$username = "root";
 	$password = "";
